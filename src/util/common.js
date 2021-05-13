@@ -1,11 +1,4 @@
-/*
- * @Author: wbt
- * @Date: 2021-04-01 16:33:02
- * @LastEditTime: 2021-04-28 09:29:00
- * @LastEditors: wbt
- * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/util/common.js
- */
+
 
 import BrowserWindow from 'sketch-module-web-view'
 import { getWebview} from 'sketch-module-web-view/remote'

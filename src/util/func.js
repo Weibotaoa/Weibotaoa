@@ -1,11 +1,4 @@
-/*
- * @Author: wbt
- * @Date: 2021-04-07 20:04:03
- * @LastEditTime: 2021-05-12 17:08:58
- * @LastEditors: wbt
- * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/util/func.js
- */
+
 
 import { createBrowerWindow, createPanel } from "./element";
 import { threadDictionary } from "./common";
@@ -102,11 +95,13 @@ export class InitContext {
   }
 
   getImage(size, name, isUrl) {
+    console.log(this.pluginSketch);
     // var isRetinaDisplay = NSScreen.mainScreen().backingScaleFactor() > 1 ? true : false;
     // var suffix = isRetinaDisplay ? '@2x' : '';
     var imageURL = this.pluginSketch
       .URLByAppendingPathComponent("toolbar")
       .URLByAppendingPathComponent(name + ".png");
+      console.log(imageURL);
     var image = NSImage.alloc().initWithContentsOfURL(imageURL);
     size && image.setSize(size);
     image.setScalesWhenResized = true;

@@ -1,11 +1,12 @@
 /*
- * @Author: wbt
+ * @Author: your name
  * @Date: 2021-04-07 16:08:40
- * @LastEditTime: 2021-04-09 14:56:16
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-05-13 20:48:36
+ * @LastEditors: your name
  * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/util/ga.js
+ * @FilePath: /sketch/hs-plugin/src/util/ga.js
  */
+
 
 //author: utom
 //address: https://gist.github.com/utom/915356b9d1f79977fa5fd7ed9a8afcc6

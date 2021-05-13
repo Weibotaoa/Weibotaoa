@@ -1,11 +1,4 @@
-/*
- * @Author: your name
- * @Date: 2020-08-08 14:47:41
- * @LastEditTime: 2021-04-12 10:49:18
- * @LastEditors: wbt
- * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/login.js
- */
+
 import { getWebview} from 'sketch-module-web-view/remote'
 import { eventEmitter, showLoginPopup } from './util/common';
 import { PLUGINS_HS_LOGIN,PLUGINS_HS_USERINFO } from "./util/constants";

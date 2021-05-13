@@ -1,12 +1,4 @@
-/*
- * @Author: wbt
- * @Date: 2021-04-15 18:23:15
- * @Description:
- * @LastEditors: wbt
- * @LastEditTime: 2021-05-11 16:59:54
- * @Github:
- * @FilePath: /wbt-plugins/src/util/base.js
- */
+
 let sketch = require("sketch");
 let dom = require("sketch/dom");
 let async = require("sketch/async");

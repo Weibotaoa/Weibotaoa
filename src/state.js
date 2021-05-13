@@ -1,11 +1,4 @@
-/*
- * @Author: wbt
- * @Date: 2021-04-07 10:23:46
- * @LastEditTime: 2021-04-07 10:28:08
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/state.js
- */
+
 
 import sketch from 'sketch'
 

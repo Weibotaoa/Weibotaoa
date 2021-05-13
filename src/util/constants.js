@@ -1,11 +1,4 @@
-/*
- * @Author: wbt
- * @Date: 2021-04-07 22:52:37
- * @LastEditTime: 2021-05-06 18:42:07
- * @LastEditors: wbt
- * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/util/constants.js
- */
+
 
 const PLUGINS_HS_LOGIN =  'com.plugins.hs.login'; // 登录的webview标识符
 const PLUGINS_HS_USERINFO = 'com.plugins.hs.userInfo'; // 登录插件的信息

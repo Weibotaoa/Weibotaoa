@@ -22,7 +22,6 @@
         "actions": {
           "Startup": "onStartup",
           "ArtboardChanged":"onArtboardChanged",
-          "OpenDocument":"onOpenDocument",
           "CloseDocument":"onCloseDocument"
         }
       }
@@ -45,7 +44,7 @@
     }
   ],
   "menu": {
-    "title": "hs-plugins",
+    "title": "hs-plugin",
     "items": [
       "hs.plugins.login",
       "hs.plugins.changeTool",

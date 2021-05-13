@@ -1,11 +1,4 @@
-/*
- * @Author: your name
- * @Date: 2021-03-31 13:14:16
- * @LastEditTime: 2021-04-27 16:31:34
- * @LastEditors: wbt
- * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/webapp/server.js
- */
+
 var http = require("http");
 
 http.createServer(function(requset,response){

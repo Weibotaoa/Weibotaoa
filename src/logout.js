@@ -1,14 +1,15 @@
-import { PLUGINS_HS_USERINFO } from "./util/constants";
-import UI from 'sketch/ui'
-import { eventEmitter } from "./util/common";
 /*
  * @Author: your name
  * @Date: 2021-04-08 15:20:18
- * @LastEditTime: 2021-04-12 11:01:16
- * @LastEditors: wbt
+ * @LastEditTime: 2021-05-13 20:48:12
+ * @LastEditors: your name
  * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/logout.js
+ * @FilePath: /sketch/hs-plugin/src/logout.js
  */
+import { PLUGINS_HS_USERINFO } from "./util/constants";
+import UI from 'sketch/ui'
+import { eventEmitter } from "./util/common";
+
 export default function (){
     eventEmitter.emit('emmiter_hsLogin', '');
     console.log(eventEmitter);

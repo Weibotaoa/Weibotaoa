@@ -1,11 +1,4 @@
-/*
- * @Author: wbt
- * @Date: 2021-03-31 11:07:58
- * @LastEditTime: 2021-05-13 19:37:26
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /wbt-plugins/src/changeTool.js
- */
+
 import {
   eventEmitter,
   showLoginPopup,
@@ -25,8 +18,6 @@ import {
   PLUGINS_HS_PANEL_PROTOCOL,
   PLUGINS_HS_PANEL_RELEVENCE,
 } from "./util/constants";
-import login from "./login";
-import { getArtboards } from "./util/base";
 
 // !! 之后把这个列表放在manifest.json中的commands中，然后读出来 让显示在这里的信息可以是commands的一个子集
 
@@ -531,10 +522,10 @@ export function onArtboardChanged() {
 }
 
 
-export function onOpenDocument(){
-    console.log("打开文档了");
+// export function onOpenDocument(){
+//     console.log("打开文档了");
    
-}
+// }
 
 // 关闭文档 清除弹框panel
 export function onCloseDocument() {
