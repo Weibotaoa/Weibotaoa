@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2021-04-07 22:52:37
+ * @LastEditTime: 2021-05-14 14:18:31
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /sketch/hs-plugin/src/util/constants.js
+ */
 
 
 const PLUGINS_HS_LOGIN =  'com.plugins.hs.login'; // 登录的webview标识符
@@ -12,6 +20,8 @@ const PLUGINS_HS_PANEL_ICON = 'com.plugins.hs.menu.icon'; // 右侧导航栏的i
 const PLUGINS_HS_PANEL_UPLOAD = 'com.plugins.hs.menu.upload'; //右侧导航栏上传显示的panel的标识符
 const PLUGINS_HS_PANEL_PROTOCOL = 'com.plugins.hs.menu.protocol'; //右侧导航栏协议显示的panel的标识符
 const PLUGINS_HS_PANEL_RELEVENCE = 'com.plugins.hs.menu.relevence'; //右侧导航栏关联显示的panel的标识符
+const COMPONENTSYMBOLS = 'HuxBC-component'; // 基础组件库名称
+const DESIGNICONSYMBOLS = 'HuxBC-globalstyle-icon'; // 图标库名
 
 
 export {
@@ -23,6 +33,8 @@ export {
     PLUGINS_HS_USERINFO,
     PLUGINS_HS_PANEL_UPLOAD,
     PLUGINS_HS_PANEL_PROTOCOL,
-    PLUGINS_HS_PANEL_RELEVENCE
+    PLUGINS_HS_PANEL_RELEVENCE,
+    COMPONENTSYMBOLS,
+    DESIGNICONSYMBOLS
 };
 

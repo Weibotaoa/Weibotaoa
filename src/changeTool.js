@@ -29,10 +29,6 @@ function switchToolBar(context, loginInfo) {
     NSUserDefaults.standardUserDefaults().objectForKey(
       PLUGIN_HS_SIDEAUTOSHOW
     ) || false;
-  console.log("--------tool");
-  console.log(
-    NSUserDefaults.standardUserDefaults().objectForKey(PLUGINS_HS_USERINFO)
-  );
   let hsInfo = loginInfo
     ? loginInfo
     : NSUserDefaults.standardUserDefaults().objectForKey(PLUGINS_HS_USERINFO) ||
@@ -44,8 +40,6 @@ function switchToolBar(context, loginInfo) {
   //如果container存在 判断用户设置 NSUserDefaults 是否自动显示 不自动显示则删除 自动显示则不进行任何操作（在代码中写else来执行对应操作）
   let container = threadDictionary[PLUGIN_HS_SIDEBAR];
   let isLogin = threadDictionary["isLogin"]; // 代表通过监听执行的函数
-  console.log("-----------islogin");
-  console.log(hsInfo);
 
   // logo click event
   function logoAction() {
@@ -96,7 +90,7 @@ function switchToolBar(context, loginInfo) {
       }
       Settings.setSessionVariable("currentMenuTitle", title);
       Settings.setSessionVariable("currentMenuSender", JSON.stringify(sender));
-      console.log(sender);
+      
       color = NSColor.colorWithRed_green_blue_alpha(
         70 / 255,
         134 / 255,
@@ -447,7 +441,6 @@ function switchToolBar(context, loginInfo) {
       PLUGIN_HS_SIDEAUTOSHOW
     );
   } else if (container && isLogin == "true") {
-    console.log("---------islogin++++++++container");
     let oldView = threadDictionary["replace_avatar"];
     // 获取数组中定义的对应的avatar的基本数据
     let oldObj = navList.filter((item) => item.id === "userAvatar")[0];
@@ -529,7 +522,6 @@ export function onArtboardChanged() {
 
 // 关闭文档 清除弹框panel
 export function onCloseDocument() {
-  console.log("关闭文档");
   // 清除弹框列表
   let clearList = [
     PLUGINS_HS_PANEL_WEB,

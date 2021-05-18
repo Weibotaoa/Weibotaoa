@@ -2,7 +2,8 @@
 
 import { createBrowerWindow, createPanel } from "./element";
 import { threadDictionary } from "./common";
-import { getArtboards, getSelectedLayers, getSymbols } from "./base";
+import { getArtboards, getSelectedLayers, getSymbols,getSymbols_noImage,getImagesByIds} from "./base";
+import { DESIGNICONSYMBOLS,COMPONENTSYMBOLS } from "./constants";
 
 import {
   PLUGINS_HS_PANEL_WEB,
@@ -95,13 +96,11 @@ export class InitContext {
   }
 
   getImage(size, name, isUrl) {
-    console.log(this.pluginSketch);
     // var isRetinaDisplay = NSScreen.mainScreen().backingScaleFactor() > 1 ? true : false;
     // var suffix = isRetinaDisplay ? '@2x' : '';
     var imageURL = this.pluginSketch
       .URLByAppendingPathComponent("toolbar")
       .URLByAppendingPathComponent(name + ".png");
-      console.log(imageURL);
     var image = NSImage.alloc().initWithContentsOfURL(imageURL);
     size && image.setSize(size);
     image.setScalesWhenResized = true;
@@ -153,7 +152,6 @@ function clearOthersWindow(currentIdentifier) {
       //     existingWebview.close();
       // }
       threadDictionary.removeObjectForKey(item);
-      console.log(prevPanel);
       prevPanel.close();
     });
 }
@@ -188,8 +186,6 @@ export function tooglePanel(
     let height = panelHeight || 600;
     panel = createPanel({ source, identifier, title, width, height });
     // NSApplication.sharedApplication.addChildWindow_ordered(panel,NSWindowAbove);
-    console.log(context);
-    console.log(context.document);
 
     let contentView = panel.contentView();
     // webview内容
@@ -199,7 +195,6 @@ export function tooglePanel(
     let request = NSURLRequest.requestWithURL(NSURL.URLWithString(url));
     webView.loadRequest(request);
     implementFunc_panel(webView, title);
-    console.log(webView.URL());
     contentView.addSubview(webView);
     threadDictionary[identifier] = panel;
   } else {
@@ -251,8 +246,9 @@ function implementFunc(browserWindow, title) {
   // });
   const webContents = browserWindow.webContents;
   if(title === 'webPlat'){
-    getSymbols('HuxBC-component',(symbolReferences) => {
-      let list = symbolReferences.filter(item => item.symbolReference.name.indexOf("common") < 0);
+    getSymbols_noImage(COMPONENTSYMBOLS,(symbolReferences) => {
+      // let list = symbolReferences.filter(item => item.symbolReference.name.indexOf("common") < 0);
+      let list = symbolReferences.filter(item => item.name.indexOf("common") < 0);
       webContents
         .executeJavaScript(`getSymbols(${JSON.stringify(list)})`)
         .catch(console.error);
@@ -271,8 +267,6 @@ function implementFunc(browserWindow, title) {
         let y = 0;
         let parent = null;
         image.forEach((item) => {
-          console.log("位图信息");
-          console.log(item);
           parent = item.parent;
           x = item.frame.x;
           y = item.frame.y;
@@ -286,7 +280,7 @@ function implementFunc(browserWindow, title) {
           let libraries = require("sketch/dom").getLibraries();
 
           let library = libraries.filter(
-            (item) => item.name === "HuxBC-component"
+            (item) => item.name === COMPONENTSYMBOLS
           )[0];
           if (library) {
             symbolReferences = library.getImportableSymbolReferencesForDocument(
@@ -324,12 +318,20 @@ function implementFunc(browserWindow, title) {
             console.log("拖拽没有移入进来。因为它没有父元素啊");
           }
         } else {
-          console.log(symbolID + "图标找不到了");
+          console.log(id + "图标找不到了");
         }
       } catch (error) {
         console.log(error);
       }
     });
+
+    webContents.on("getImagesByIds",async function(symbolId){
+      let images = await getImagesByIds(symbolId,COMPONENTSYMBOLS);
+      console.log(images);
+      webContents
+      .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
+      .catch(console.error);
+    })
   }
   if (title === "upload") {
     let allArtBoards = getArtboards();
@@ -344,7 +346,7 @@ function implementFunc(browserWindow, title) {
       .catch(console.error);
   }
   if (title === "icon") {
-    getSymbols('HuxBC-globalstyle-icon',(symbolReferences) => {
+    getSymbols(DESIGNICONSYMBOLS,(symbolReferences) => {
       webContents
         .executeJavaScript(`getSymbols(${JSON.stringify(symbolReferences)})`)
         .catch(console.error);
@@ -366,8 +368,6 @@ function implementFunc(browserWindow, title) {
         let y = 0;
         let parent = null;
         image.forEach((item) => {
-          console.log("位图信息");
-          console.log(item);
           parent = item.parent;
           x = item.frame.x;
           y = item.frame.y;
@@ -381,7 +381,7 @@ function implementFunc(browserWindow, title) {
           let libraries = require("sketch/dom").getLibraries();
 
           let library = libraries.filter(
-            (item) => item.name === "HuxBC-globalstyle-icon"
+            (item) => item.name === DESIGNICONSYMBOLS
           )[0];
           if (library) {
             symbolReferences = library.getImportableSymbolReferencesForDocument(
@@ -444,28 +444,10 @@ function implementFunc(browserWindow, title) {
   }
 }
 
-
-function pointInArtboard(artboardList,point){
-  let {x,y,parent} = point;
-  console.log("这是位图的parent");
-  console.log();
-  return artboardList.filter(artboard => {
-      let Xmin = artboard.frame.x;
-      let Ymax = artboard.frame.y;
-      let Xmax = Xmin + artboard.frame.width;
-      let Ymin = Ymax - artboard.frame.height;
-       // condition: Xmin < x < Xmax  && Ymin < y < Ymax
-       if(Xmin < x < Xmax  && Ymin < y < Ymax){
-          return artboard;
-       }
-  })[0] 
-}
-
 // !! 与createPanel等可以一起删除
 function implementFunc_panel(myView, title) {
   if (title === "upload") {
     let allArtBoards = getArtboards();
-    console.log(allArtBoards);
     myView.evaluateJavaScript_completionHandler(
       `getArtboardList(${JSON.stringify(allArtBoards)})`,
       nil
