@@ -22,7 +22,8 @@
         "actions": {
           "Startup": "onStartup",
           "ArtboardChanged":"onArtboardChanged",
-          "CloseDocument":"onCloseDocument"
+          "CloseDocument":"onCloseDocument",
+          "OpenDocument":"onOpenDocument"
         }
       }
     },

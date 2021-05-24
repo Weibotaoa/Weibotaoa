@@ -4,6 +4,7 @@ import { createBrowerWindow, createPanel } from "./element";
 import { threadDictionary } from "./common";
 import { getArtboards, getSelectedLayers, getSymbols,getSymbols_noImage,getImagesByIds} from "./base";
 import { DESIGNICONSYMBOLS,COMPONENTSYMBOLS } from "./constants";
+import { parseSelectArtboard } from "../util/parseArtboard/init";
 
 import {
   PLUGINS_HS_PANEL_WEB,
@@ -327,7 +328,6 @@ function implementFunc(browserWindow, title) {
 
     webContents.on("getImagesByIds",async function(symbolId){
       let images = await getImagesByIds(symbolId,COMPONENTSYMBOLS);
-      console.log(images);
       webContents
       .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
       .catch(console.error);
@@ -338,6 +338,10 @@ function implementFunc(browserWindow, title) {
     webContents
       .executeJavaScript(`getArtboardList(${JSON.stringify(allArtBoards)})`)
       .catch(console.error);
+      // 点击上传
+      webContents.on("uploadArtboard",function(){
+        parseSelectArtboard();
+      })
   }
   if (title === "protocol") {
     let allLayers = getSelectedLayers();
@@ -346,11 +350,18 @@ function implementFunc(browserWindow, title) {
       .catch(console.error);
   }
   if (title === "icon") {
-    getSymbols(DESIGNICONSYMBOLS,(symbolReferences) => {
+    getSymbols_noImage(DESIGNICONSYMBOLS,(symbolReferences) => {
       webContents
         .executeJavaScript(`getSymbols(${JSON.stringify(symbolReferences)})`)
         .catch(console.error);
     });
+
+    webContents.on("getImagesByIds",async function(symbolId){
+      let images = await getImagesByIds(symbolId,DESIGNICONSYMBOLS);
+      webContents
+      .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
+      .catch(console.error);
+    })
 
     // 
     webContents.on("symbolDrag", (params) => {

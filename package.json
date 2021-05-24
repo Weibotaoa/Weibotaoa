@@ -24,6 +24,9 @@
     "@skpm/builder": "^0.7.0"
   },
   "dependencies": {
+    "@skpm/fs": "^0.2.6",
+    "@skpm/promise": "^0.1.0",
+    "@wubafe/picasso-parse": "0.0.18",
     "sketch-module-web-view": "^3.1.4"
   },
   "resources": [

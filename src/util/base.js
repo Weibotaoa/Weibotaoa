@@ -28,15 +28,15 @@ function getArtboards() {
   if (selectedDocument) {
     if (selectedDocument.pages.length > 0) {
       let pages = selectedDocument.pages;
-      // let selectedPages = pages.filter(item => item.selected === true);
       pages.map((page) => {
         if (page.layers.length > 0) {
           page.layers.map((item) => {
-            let buffer = sketch.export(item, { output: false });
-            let artboardBase64 = buffer.toString("base64");
             if (item.type === "Artboard") {
+              let buffer = sketch.export(item, { output: false });
+              let artboardBase64 = buffer.toString("base64");
               let obj = {};
               obj["base64"] = artboardBase64;
+              obj["base64"] = '';
               obj["info"] = item;
               obj["pageInfo"] = page;
               obj["currentPage"] = getSelectedArtboardId(pages);

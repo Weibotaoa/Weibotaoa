@@ -21,7 +21,10 @@ import {
 
 // !! 之后把这个列表放在manifest.json中的commands中，然后读出来 让显示在这里的信息可以是commands的一个子集
 
+let Settings = require('sketch/settings');
+
 function switchToolBar(context, loginInfo) {
+  console.log(context);
   let commonContext = new InitContext(context);
   // Make a view for your view controller
   // todo 待实现功能
@@ -71,8 +74,6 @@ function switchToolBar(context, loginInfo) {
 
   function toogleColor(sender, title) {
     let color = "";
-
-    let Settings = require("sketch/settings");
 
     if (Settings.sessionVariable("currentMenuTitle") === title) {
       Settings.setSessionVariable("currentMenuTitle", "");
@@ -514,6 +515,16 @@ export function onArtboardChanged() {
   //     NSUserDefaults.standardUserDefaults().setObject_forKey(allArtBoards,'allArtBoards')
 }
 
+// 打开文档
+export function onOpenDocument(){
+  // console.log("open document wbt");
+  // let menuContext = NSUserDefaults.standardUserDefaults().objectForKey('menuContext');
+  // if(menuContext){
+  //   switchToolBar(JSON.parse(menuContext));
+  // }
+  
+}
+
 
 // export function onOpenDocument(){
 //     console.log("打开文档了");
@@ -543,6 +554,11 @@ export function onCloseDocument() {
 }
 
 export default function (context) {
+  // NSUserDefaults.standardUserDefaults().removeObjectForKey("menuContext");
+  // NSUserDefaults.standardUserDefaults().setObject_forKey(
+  //   JSON.stringify(context),
+  //   'menuContext'
+  // );
   // !! 获取用户默认设置，是否需要直接显示侧边栏  这个应该是监听文档打开事件。当文档打开的时候，创建一个侧边栏
   switchToolBar(context);
   // 监听事件 如果有登录信息则刷新则给hsInfo赋值
