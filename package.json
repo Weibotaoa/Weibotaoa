@@ -27,12 +27,11 @@
     "@skpm/fs": "^0.2.6",
     "@skpm/promise": "^0.1.0",
     "@wubafe/picasso-parse": "0.0.18",
-    "sketch-module-web-view": "^3.1.4",
-    "hsdsl": "1.0.0"
+    "sketch-module-web-view": "^3.1.4"
   },
   "resources": [
     "resources/**/*.js"
   ],
-  "repository": "https://github.com/Weibotaoa/firstProject",
+  "repository": "https://github.com/Weibotaoa/firstProject.git",
   "author": "韦博韬 <weibt36613@hundsun.com>"
 }
