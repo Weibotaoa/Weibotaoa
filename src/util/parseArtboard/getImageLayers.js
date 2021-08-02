@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-05-24 09:21:51
- * @LastEditTime: 2021-05-24 18:45:14
+ * @LastEditTime: 2021-05-25 09:15:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /sketch/hs-plugin/src/util/parseArtboard/getImageLayers.js
@@ -127,7 +127,7 @@ const _getImageLayers = (layers,symbolInstanceIds, fontMap, symbolGroups, codeIm
             }
 
             removeLayer(tempGroup);
-        } else if (Array.isArray(layer.layers)) {x
+        } else if (Array.isArray(layer.layers)) {
             _getImageLayers(layer.layers, symbolInstanceIds, fontMap, symbolGroups, codeImageMap, rootPath, sliceSize, _exportLayers);
         }
     }

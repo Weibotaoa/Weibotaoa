@@ -1,8 +1,17 @@
+/*
+ * @Author: your name
+ * @Date: 2021-03-31 13:14:16
+ * @LastEditTime: 2021-06-29 09:36:04
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: /sketch/hs-plugin/src/webapp/server.js
+ */
 
 var http = require("http");
 
+let allowOrigin = 'http://localhost:8000';
 http.createServer(function(requset,response){
-   
+
     const {method,url} = requset;
     if(url === '/getUserInfo' && method === 'POST'){
         let reqData = [];
@@ -16,10 +25,10 @@ http.createServer(function(requset,response){
             const params = JSON.parse(data.toString());
             console.log(params);
             if(params.name === 'admin' && params.pass === '123456'){
-                response.writeHead('200',{'Content-Type':'application/json;charset=utf-8','Access-Control-Allow-Origin':'http://localhost:8000'});
+                response.writeHead('200',{'Content-Type':'application/json;charset=utf-8','Access-Control-Allow-Origin':allowOrigin});
                 response.end(JSON.stringify({code:200,body:{name:'admin',pass:'123456',avatar:'https://cdn.2-class.com/image/cover/C5F5389C14FE448BB75F576E711E7C70-6-2.png'}}))
             }else{
-                response.writeHead('200',{'Content-Type':'text/plain;charset=utf-8','Access-Control-Allow-Origin':'http://localhost:8000'});
+                response.writeHead('200',{'Content-Type':'text/plain;charset=utf-8','Access-Control-Allow-Origin':allowOrigin});
                 response.end(JSON.stringify({code:500,body:'账号或者密码错误'}));
             }
         });
@@ -28,13 +37,13 @@ http.createServer(function(requset,response){
         let reqData = [];
         let size = 0;
         response.writeHead(200, {
-            "Access-Control-Allow-Origin": "http://localhost:8000",
+            "Access-Control-Allow-Origin": allowOrigin,
             "Access-Control-Allow-Headers": "X-Token,Content-Type",
             "Access-Control-Allow-Methods": "PUT"
           });
           response.end();
     }else{
-        response.writeHead('200',{'Content-Type':'application/json;charset=utf-8','Access-Control-Allow-Origin':'http://localhost:8000'});
+        response.writeHead('200',{'Content-Type':'application/json;charset=utf-8','Access-Control-Allow-Origin':allowOrigin});
         response.end(JSON.stringify({name:'1',pass:'1'}))
     }
     

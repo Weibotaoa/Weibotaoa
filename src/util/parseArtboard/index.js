@@ -1,7 +1,7 @@
 /*
  * @Author: wbt
  * @Date: 2021-05-24 09:17:01
- * @LastEditTime: 2021-05-24 20:17:57
+ * @LastEditTime: 2021-05-27 09:12:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /sketch/hs-plugin/src/util/parseArtboard.js
@@ -22,7 +22,8 @@ import getImageLayers from './getImageLayers';
  *
  */
 export const parseArtboard = (artboardItem,codeType, progressSlice, getProgress, rootPath) => new Promise((resolve, reject) => {
-    // 未解析，则走解析流程
+    try {
+          // 未解析，则走解析流程
     const symbolInstanceIds = [];
     // 字体存储
     const fontMap = {};
@@ -40,6 +41,9 @@ export const parseArtboard = (artboardItem,codeType, progressSlice, getProgress,
     getProgress(parseDocument.artProgress);
     // console.log('画板导出开始：');
     const artboardJSON = sketch.export(artboardItem, { formats: 'json', output: false });
+
+     console.log('这是导出的artboardJSON');
+    console.log(artboardJSON);
     const d3 = new Date().valueOf();
     // console.log('画板导出结束：', d3-d2);
     parseDocument.artProgress += progressSlice * 0.1;
@@ -111,14 +115,12 @@ export const parseArtboard = (artboardItem,codeType, progressSlice, getProgress,
 
                 layers[i].layers = [];
                 layers[i].imageUrl = sliceObject[layers[i].do_objectID];
-
             }
 
             if (Array.isArray(layers[i].layers)) {
                 layers[i].layers = _handleSlice(layers[i].layers,sliceObject);
             }
         }
-
         return layers;
     };
 
@@ -175,9 +177,13 @@ export const parseArtboard = (artboardItem,codeType, progressSlice, getProgress,
     // 切片尺寸处理
     artboardJSON.layers = _handleCodeImage(artboardJSON.layers, codeImageMap);
 
+    // console.log(artboardJSON);
+    
     // 代码DSL
     const codeDSL = codeType===1 ? picassoArtboardOperationCodeParse(JSON.parse(JSON.stringify(artboardJSON))) : picassoArtboardCodeParse(JSON.parse(JSON.stringify(artboardJSON)));
-
+    
+    // console.log(codeDSL);
+    
     // 图片map
     const imageMap = {};
 
@@ -260,7 +266,11 @@ export const parseArtboard = (artboardItem,codeType, progressSlice, getProgress,
 
     parseDocument.artProgress += progressSlice * 0.05;
     getProgress(parseDocument.artProgress);
-    resolve({id: codeDSL.id, name: codeDSL.name.replace(/\//g, '／')});
+    // resolve({id: codeDSL.id, name: codeDSL.name.replace(/\//g, '／')});
+    resolve(codeDSL);
+    } catch (error) {
+        console.log(error);
+    }
 });
 
 /**
@@ -300,8 +310,8 @@ export const parseArtboardIterator = (artboardList,codeType, progressSlice, getP
  *
  */
 export const parseDocument = (type,codeType, rootPath, getProgress = () => {}) => new Promise((resolve, reject) => {
-
-    // 重置参数
+    try {
+          // 重置参数
     parseDocument.artProgress = 0;
     getProgress(parseDocument.artProgress);
 
@@ -340,9 +350,13 @@ export const parseDocument = (type,codeType, rootPath, getProgress = () => {}) =
     }).catch((err) => {
         reject(err);
     });
+    } catch (error) {
+        console.log(error);
+    }
 });
 
 // 解析进度
 parseDocument.artProgress = 0;
 // 取消标识
 parseDocument.isCancel = false;
+

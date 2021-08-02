@@ -236,11 +236,9 @@ export const createPanel = (params) => {
 };
 
 export const createBrowerWindow = (params) => {
-  console.log("params:" + params.width);
   let options = {
     id: params.identifier,
     frame: false,
-    // titleBarStyle:'hidden',
     resizable: false,
     with: params.width,
     height: params.height,
@@ -248,40 +246,23 @@ export const createBrowerWindow = (params) => {
     maxWidth: params.width,
     minHeight: params.heght,
     maxHeight: params.heght,
-    // vibrancy: 'sidebar',
-    // isAlwaysOnTop:true,
-    // closable:false,
-    // fullScreenable:false,
   };
 
   COScript.currentCOScript().setShouldKeepAround(true);
   const threadDictionary = NSThread.mainThread().threadDictionary();
-
-  // const panel = NSPanel.alloc().init();
   const browserWindow = new BrowserWindow(options);
   browserWindow.center();
-
-  // panel.setFrame_display(Bounds, true)
-  threadDictionary[options.identifier] = browserWindow;
-  let mousePos = NSEvent.mouseLocation();
+  // threadDictionary[options.identifier] = browserWindow;
+  let window = NSApp.mainWindow();
   browserWindow.setAlwaysOnTop(true);
   browserWindow.isMovable(true);
   let sidebar = threadDictionary[PLUGIN_HS_SIDEBAR];
-  console.log("侧边栏的信息");
   //侧边栏相对app的x坐标
   let relativeToApp = sidebar.superview().frame();
-  //browserWindow.setBounds({ x: relativeToApp.origin.x - params.width, y: 400, width: params.width, height: params.height })
+  let pos = window.convertPointToScreen(relativeToApp.origin)
   browserWindow.setSize(params.width, params.height);
-  browserWindow.setPosition(mousePos.x - params.width, mousePos.y);
-
-  // let relativeToScreen = NSWindow.alloc().init().convertRectToScreen(relativeToApp);
-  // browserWindow.setPosition(relativeToApp.origin.x - params.width,400);
-  // browserWindow.setAspectRatio(1,{width:params.width,height:params.height})
+  browserWindow.setPosition(pos.x - params.width, pos.y);
   browserWindow.setMovable(true);
-  // browserWindow.setIgnoreMouseEvents(true); //使窗口忽略所有鼠标事件
-  // browserWindow.removeMenu();
-  // browserWindow.isModal(true);
-
   browserWindow.once("ready-to-show", () => {
     browserWindow.show();
   });

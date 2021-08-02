@@ -1,4 +1,7 @@
-import { COMPONENTSYMBOLS, DESIGNICONSYMBOLS } from "./constants";
+import {
+  COMPONENTSYMBOLS,
+  DESIGNICONSYMBOLS
+} from "./constants";
 
 let sketch = require("sketch");
 let dom = require("sketch/dom");
@@ -10,7 +13,7 @@ let Settings = require("sketch/settings");
 let Page = sketch.Page;
 
 let componentIcons = []; //缓存基础组件列表
-let designIcons = []; // 缓存图标列表
+let designIcons = []; // 缓存图标 列表
 
 /**
  *
@@ -21,25 +24,37 @@ let designIcons = []; // 缓存图标列表
 function getSelectedArtboardId(list) {
   return list.filter((item) => item.selected === true)[0];
 }
-
+// 获取画板列表
 function getArtboards() {
   let artboards = [];
   let selectedDocument = dom.getSelectedDocument();
   if (selectedDocument) {
     if (selectedDocument.pages.length > 0) {
       let pages = selectedDocument.pages;
+      let currentPageId = getSelectedArtboardId(pages).id
       pages.map((page) => {
         if (page.layers.length > 0) {
           page.layers.map((item) => {
             if (item.type === "Artboard") {
-              let buffer = sketch.export(item, { output: false });
-              let artboardBase64 = buffer.toString("base64");
+              // let buffer = sketch.export(item, { output: false });
+              // let artboardBase64 = buffer.toString("base64");
               let obj = {};
-              obj["base64"] = artboardBase64;
               obj["base64"] = '';
-              obj["info"] = item;
-              obj["pageInfo"] = page;
-              obj["currentPage"] = getSelectedArtboardId(pages);
+              obj["info"] = {
+                id: item.id,
+                name: item.name,
+                frame: item.frame,
+                type: item.type,
+                pageId: page.id,
+                checked:item.selected
+              };
+              obj["pageInfo"] = {
+                id: page.id,
+                name: page.name
+              };
+              obj["currentPage"] = {
+                id: currentPageId
+              };
               artboards.push(obj);
             }
           });
@@ -48,6 +63,49 @@ function getArtboards() {
     }
   }
   return artboards;
+
+}
+
+function getSelectefArtboardIds() {
+  let artboardIds = [];
+  let selectedDocument = dom.getSelectedDocument();
+  if (selectedDocument) {
+    if (selectedDocument.pages.length > 0) {
+      let pages = selectedDocument.pages;
+
+      pages.map((page) => {
+        if (page.layers.length > 0) {
+          page.layers.map((item) => {
+            if (item.type === "Artboard" && item.selected === true) {
+              artboardIds.push(item.id);
+            }
+          });
+        }
+      });
+    }
+  }
+  return artboardIds;
+}
+
+// 根据id获取画板图像base64 和 sketchData
+function getBase64_sektchData(ids) {
+  let arr = [];
+  ids = JSON.parse(ids);
+  ids.map(artboardId => {
+    let artboard = sketch.find('Artboard,[id="' + artboardId + '"]');
+    let buffer = sketch.export(artboard[0], {
+      formats: 'png',
+      output: false
+    });
+    let artboardBase64 = `data:image/png;base64,${buffer.toString("base64")}`;
+    let artboardData = JSON.parse(JSON.stringify(artboard));
+    arr.push({
+      artboardId,
+      artboardBase64,
+      artboardData
+    })
+  })
+  return arr;
 }
 
 /**
@@ -67,7 +125,7 @@ function getSymbols(libraryName, callback) {
   let sketch = require("sketch/dom");
   // let Library = sketch.Library;
 
-  //添加HuxBC-globalstyle-icon库
+  // 添加HuxBC-globalstyle-icon库
   // Library.getRemoteLibraryWithRSS(
   //   "https://jingwhale.github.io/sketchlibrary/globalstyle/globalstyle-icon.xml",
   //   (err, library) => {
@@ -125,6 +183,7 @@ function getSymbols(libraryName, callback) {
   }
 }
 
+// 获取不带图片的symbol列表
 export function getSymbols_noImage(libraryName, callback) {
   let symbolList = [];
   let symbolReferences = getLibraryIcons(libraryName);
@@ -149,34 +208,41 @@ export function getSymbols_noImage(libraryName, callback) {
   }
 }
 
+// 根据ids获取symbol对应的图片列表
 async function getImagesByIds(symbolIds, libraryName) {
   let symbolReferences = getLibraryIcons(libraryName);
-    let symbolReferenceList = symbolReferences.filter(item => symbolIds.indexOf(item.id) > -1);
-    let promiseList = [];
-    symbolReferenceList.forEach(symbolReference => {
-      if (symbolReference) {
-        try {
-          promiseList.push(new Promise((resolve,reject) => {
-            let symbol = symbolReference.import();
-            let newPage = new Page();
-            newPage.parent = document;
-            symbol.parent = newPage;
-            let options = { formats: "png", output: false };
-            let buffer = sketch.export(symbol, options);
-            let symboolBase64 = buffer.toString("base64");
-            // images.push({id:symbol.id,symboolBase64})
-            newPage.parent = nil; // 删除掉当前页面
-            newPage.remove();
-            resolve({id:symbolReference.id,symboolBase64})
-          }))
-          
-        } catch (error) {
-          console.log(error);
-        }
+  let symbolReferenceList = symbolReferences.filter(item => symbolIds.indexOf(item.id) > -1);
+  let promiseList = [];
+  symbolReferenceList.forEach(symbolReference => {
+    if (symbolReference) {
+      try {
+        promiseList.push(new Promise((resolve, reject) => {
+          let symbol = symbolReference.import();
+          let newPage = new Page();
+          newPage.parent = document;
+          symbol.parent = newPage;
+          let options = {
+            formats: "png",
+            output: false
+          };
+          let buffer = sketch.export(symbol, options);
+          let symboolBase64 = buffer.toString("base64");
+          // images.push({id:symbol.id,symboolBase64})
+          newPage.parent = nil; // 删除掉当前页面
+          newPage.remove();
+          resolve({
+            id: symbolReference.id,
+            symboolBase64
+          })
+        }))
+
+      } catch (error) {
+        console.log(error);
       }
-    })
-     let images = await Promise.all(promiseList);
-    
+    }
+  })
+  let images = await Promise.all(promiseList);
+
   //    images.map((val)=> {
   //     console.log(val);    
   // });
@@ -184,8 +250,7 @@ async function getImagesByIds(symbolIds, libraryName) {
 }
 
 
-//
-
+//获取图标列表
 function getLibraryIcons(libraryName) {
   let libraries = sketch.getLibraries();
 
@@ -209,7 +274,10 @@ function getSymboldData_image(symbolReferences) {
     let newPage = new Page();
     newPage.parent = document;
     symbol.parent = newPage;
-    let options = { formats: "png", output: false };
+    let options = {
+      formats: "png",
+      output: false
+    };
     let buffer = sketch.export(symbol, options);
     let symboolBase64 = buffer.toString("base64");
     newPage.parent = nil; // 删除掉当前页面
@@ -223,4 +291,32 @@ function getSymboldData_image(symbolReferences) {
   return symbolList;
 }
 
-export { getArtboards, getSelectedLayers, getSymbols, getImagesByIds };
+// 获取sketch文档信息
+
+function getSketchInfo() {
+  if (document.path) {
+    let path = decodeURI(document.path);
+    let index = path.lastIndexOf("/");
+    let name = path.slice(index + 1, path.length);
+    let id = document.id;
+    return {
+      name,
+      id
+    }
+  } else {
+    UI.message("请先保存文件");
+    return null;
+  }
+
+
+}
+
+export {
+  getArtboards,
+  getSelectedLayers,
+  getSymbols,
+  getImagesByIds,
+  getSketchInfo,
+  getBase64_sektchData,
+  getSelectefArtboardIds
+};

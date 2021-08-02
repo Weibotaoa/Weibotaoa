@@ -1,6 +1,6 @@
 import UI from 'sketch/ui';
 import { Document } from 'sketch/dom';
-import { parseDocument } from './parseArtboard/index';
+import { parseDocument } from './index';
 
 const _ = (str) => str.replace(/\%\@/gi, '');
 
@@ -25,7 +25,7 @@ const getSavePath = (fileName) => {
     return savePanel.URL().path();
 }
 
-const parseArtboard = (type, codeType) => {
+const parseArtboard = (type, codeType,callback) => {
 
     const document = Document.getSelectedDocument();
 
@@ -50,10 +50,13 @@ const parseArtboard = (type, codeType) => {
             // console.log('当前进度：', progress);
             UI.message(`当前进度：${+((progress*100).toFixed(4))}%`);
         }).then((res) => {
-            // console.log('解析完成：', res);
+            console.log('解析完成：', res);
+            if(callback){
+                callback(res);
+            }
             UI.message('解析完成！');
-            // 解析完成，打开结果文件目录
-            NSWorkspace.sharedWorkspace().activateFileViewerSelectingURLs([NSURL.fileURLWithPath(`${rootPath}/${res[0]&&res[0].name}`)]);
+            // 解析完成，打开结果文件目录 获取到DSLCode就可以了
+           // NSWorkspace.sharedWorkspace().activateFileViewerSelectingURLs([NSURL.fileURLWithPath(`${rootPath}/${res[0]&&res[0].name}`)]);
         }).catch((err) => {
             // console.log('解析失败', err);
             UI.message('解析失败！');
@@ -63,12 +66,12 @@ const parseArtboard = (type, codeType) => {
 }
 
 // web代码普通版
-export const parseSelectArtboard = () => {
-    parseArtboard(1,0);
+export const parseSelectArtboard = (callback) => {
+    parseArtboard(1,0,callback);
 }
 
-export const parseAllArtboard = () => {
-    parseArtboard(2,0);
+export const parseAllArtboard = (callback) => {
+    parseArtboard(2,0,callback);
 }
 // web代码运营版
 export const parseSelectArtboardOperation = () => {

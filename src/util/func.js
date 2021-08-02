@@ -1,10 +1,28 @@
-
-
-import { createBrowerWindow, createPanel } from "./element";
-import { threadDictionary } from "./common";
-import { getArtboards, getSelectedLayers, getSymbols,getSymbols_noImage,getImagesByIds} from "./base";
-import { DESIGNICONSYMBOLS,COMPONENTSYMBOLS } from "./constants";
-import { parseSelectArtboard } from "../util/parseArtboard/init";
+import {
+  createBrowerWindow,
+  createPanel
+} from "./element";
+import {
+  threadDictionary,
+  baseUrl
+} from "./common";
+import {
+  getArtboards,
+  getSelectedLayers,
+  getSymbols,
+  getSymbols_noImage,
+  getImagesByIds,
+  getSketchInfo,
+  getBase64_sektchData
+} from "./base";
+import {
+  DESIGNICONSYMBOLS,
+  COMPONENTSYMBOLS
+} from "./constants";
+// import { parseSelectArtboard } from "../util/parseArtboard/init";
+import {
+  parseSelectArtboard
+} from '../util/parse/index';
 
 import {
   PLUGINS_HS_PANEL_WEB,
@@ -12,16 +30,13 @@ import {
   PLUGINS_HS_PANEL_UPLOAD,
   PLUGINS_HS_PANEL_PROTOCOL,
   PLUGINS_HS_PANEL_RELEVENCE,
+  PLUGINS_HS_PANEL_COMPONENT_LIBRARY
 } from "./constants";
 
 let UI = require("sketch/ui");
 export class InitContext {
   constructor(context) {
-    this.pluginSketch = context.plugin
-      .url()
-      .URLByAppendingPathComponent("Contents")
-      .URLByAppendingPathComponent("Sketch")
-      .URLByAppendingPathComponent("library");
+    this.pluginSketch = context.plugin.url().URLByAppendingPathComponent("Contents").URLByAppendingPathComponent("Resources").URLByAppendingPathComponent("icons");
   }
 
   /**
@@ -65,7 +80,7 @@ export class InitContext {
     // button.state = 1;
     button.imagePosition = NSImageAbove;
     button.setFont(NSFont.fontWithName_size("Arial", 12));
-    button.setButtonType(NSMomentaryChangeButton);
+    button.setButtonType(NSButtonTypeToggle);
     button.setTarget(button);
 
     button.setAction("onClickListener:");
@@ -99,9 +114,11 @@ export class InitContext {
   getImage(size, name, isUrl) {
     // var isRetinaDisplay = NSScreen.mainScreen().backingScaleFactor() > 1 ? true : false;
     // var suffix = isRetinaDisplay ? '@2x' : '';
-    var imageURL = this.pluginSketch
-      .URLByAppendingPathComponent("toolbar")
-      .URLByAppendingPathComponent(name + ".png");
+    // console.log( this.pluginSketch.URLByAppendingPathComponent("Resources"));
+    // console.log( this.pluginSketch.URLByAppendingPathComponent('Contents'));
+
+    var imageURL = this.pluginSketch.URLByAppendingPathComponent("".concat(name, ".png"));
+    console.log(imageURL);
     var image = NSImage.alloc().initWithContentsOfURL(imageURL);
     size && image.setSize(size);
     image.setScalesWhenResized = true;
@@ -119,22 +136,6 @@ export function openUrlInBrowser(url) {
  *  该方法清除 除了自己之外的其他panel
  * 目前被用于 tooglePanel方法
  */
-function clearOthersPanel(currentIdentifier) {
-  let identifierList = [
-    PLUGINS_HS_PANEL_WEB,
-    PLUGINS_HS_PANEL_ICON,
-    PLUGINS_HS_PANEL_UPLOAD,
-    PLUGINS_HS_PANEL_PROTOCOL,
-    PLUGINS_HS_PANEL_RELEVENCE,
-  ];
-  identifierList
-    .filter((item) => threadDictionary[item] && item !== currentIdentifier)
-    .forEach((item) => {
-      let prevPanel = threadDictionary[item];
-      threadDictionary.removeObjectForKey(item);
-      prevPanel.close();
-    });
-}
 
 function clearOthersWindow(currentIdentifier) {
   let identifierList = [
@@ -143,6 +144,7 @@ function clearOthersWindow(currentIdentifier) {
     PLUGINS_HS_PANEL_UPLOAD,
     PLUGINS_HS_PANEL_PROTOCOL,
     PLUGINS_HS_PANEL_RELEVENCE,
+    PLUGINS_HS_PANEL_COMPONENT_LIBRARY
   ];
   identifierList
     .filter((item) => threadDictionary[item] && item !== currentIdentifier)
@@ -157,57 +159,29 @@ function clearOthersWindow(currentIdentifier) {
     });
 }
 
-/**
- *
- *
- * @export
- * @param {*} context  执行组件的context
- * @param {*} container  按钮所在的容器
- * @param {*} url   panel 加载的页面的路径
- * @param {*} identifier  按钮对应的panel的唯一标识符
- * @param {*} title  按钮所对应的panel的标题
- */
-export function tooglePanel(
-  source,
-  context,
-  container,
-  url,
-  identifier,
-  title,
-  panelWidth,
-  panelHeight
-) {
-  // let commonContext =  new InitContext(context);
-  clearOthersPanel(identifier); // 清除掉放在数组里面的除了自己之外的所有panel
-
-  //  登录弹框用browserWindow，功能弹框用panel
-  let panel = threadDictionary[identifier];
-  if (!panel) {
-    let width = panelWidth || 800;
-    let height = panelHeight || 600;
-    panel = createPanel({ source, identifier, title, width, height });
+function showBrowerWindowByIdentifier(params) {
+  let {
+    title,
+    width,
+    height,
+    url,
+    identifier
+  } = params;
+  try {
+    clearOthersWindow(identifier); // 清除掉放在数组里面的除了自己之外的所有window
+    let browserWindow = createBrowerWindow({
+      identifier,
+      title,
+      width,
+      height
+    });
     // NSApplication.sharedApplication.addChildWindow_ordered(panel,NSWindowAbove);
-
-    let contentView = panel.contentView();
-    // webview内容
-    let webView = WKWebView.alloc().initWithFrame(
-      NSMakeRect(0, 0, width, height)
-    );
-    let request = NSURLRequest.requestWithURL(NSURL.URLWithString(url));
-    webView.loadRequest(request);
-    implementFunc_panel(webView, title);
-    contentView.addSubview(webView);
-    threadDictionary[identifier] = panel;
-  } else {
-    threadDictionary.removeObjectForKey(identifier);
-    panel.close();
+    implementFunc(browserWindow, title);
+    browserWindow.loadURL(url);
+    threadDictionary[identifier] = browserWindow;
+  } catch (error) {
+    console.log(error);
   }
-
-  //   let closeButton = commonContext.addButton(container,NSMakeRect(20, 53, 31, 31), "miaow","miaowActive","关闭弹框",
-  //    function (sender) {
-  //        panel.close();
-  //    });
-  //    contentView.addSubview(closeButton);
 }
 
 export function toogleBrowerWindow(
@@ -246,18 +220,18 @@ function implementFunc(browserWindow, title) {
   //     console.log(error);
   // });
   const webContents = browserWindow.webContents;
-  if(title === 'webPlat'){
-    getSymbols_noImage(COMPONENTSYMBOLS,(symbolReferences) => {
+  if (title === 'webPlat') {
+    let componentList = [];
+    getSymbols_noImage(COMPONENTSYMBOLS, (symbolReferences) => {
       // let list = symbolReferences.filter(item => item.symbolReference.name.indexOf("common") < 0);
-      let list = symbolReferences.filter(item => item.name.indexOf("common") < 0);
+      componentList = symbolReferences.filter(item => item.name.indexOf("common") < 0);
       webContents
-        .executeJavaScript(`getSymbols(${JSON.stringify(list)})`)
+        .executeJavaScript(`getSymbols(${JSON.stringify(componentList)})`)
         .catch(console.error);
     });
     webContents.on("componentDrag", (id) => {
-      let symbolList = [];
-      let symbolReferences = [];
-      
+
+
       try {
         let sketch = require("sketch/dom");
         let document = sketch.getSelectedDocument();
@@ -275,62 +249,73 @@ function implementFunc(browserWindow, title) {
           item.remove();
         });
 
-        if (symbolList.length > 0) {
-          symbolReferences = symbolList;
-        } else {
-          let libraries = require("sketch/dom").getLibraries();
+        // if (symbolList.length > 0) {
+        //   symbolReferences = symbolList;
+        // } else {
+        //   let libraries = require("sketch/dom").getLibraries();
 
-          let library = libraries.filter(
-            (item) => item.name === COMPONENTSYMBOLS
-          )[0];
-          if (library) {
-            symbolReferences = library.getImportableSymbolReferencesForDocument(
-              document
-            );
-          }
-        }
+        //   let library = libraries.filter(
+        //     (item) => item.name === COMPONENTSYMBOLS
+        //   )[0];
+        //   if (library) {
+        //     symbolReferences = library.getImportableSymbolReferencesForDocument(
+        //       document
+        //     );
+        //   }
+        // }
 
-        let dragSymbol = symbolReferences.filter((item) => {
+        let dragSymbol = componentList.filter((item) => {
           return item.id === id;
         })[0];
 
         if (dragSymbol) {
           let page = document.selectedPage;
-          
+
           let symbolMaster = dragSymbol.import();
           let symbolInstance = symbolMaster.createNewInstance();
-          
+
           if (parent) {
-              if(parent.type === 'Artboard'){
-                symbolInstance.frame.x = x;
-                symbolInstance.frame.y =  y;
-                symbolInstance.parent = parent;
-                parent.parent = page;
-                //document.sketchObject.inspectorController().reload()
-                // artboard.adjustToFit();
-              }else if(parent.type === 'Page'){
-                symbolInstance.frame.x = x;
-                symbolInstance.frame.y = y;
-                symbolInstance.parent = page;
-              }else {
-                console.log("拖拽到了一个非画板和页面的元素,开发者没有想到呢啊.联系程序员改bug");
-              }
-          } else{
-            console.log("拖拽没有移入进来。因为它没有父元素啊");
+            if (parent.type === 'Page') {
+              symbolInstance.frame.x = x;
+              symbolInstance.frame.y = y;
+              symbolInstance.parent = page;
+            } else {
+              symbolInstance.frame.x = x;
+              symbolInstance.frame.y = y;
+              symbolInstance.parent = parent;
+              parent.parent = page;
+            }
+            // if(parent.type === 'Artboard'){
+            //   symbolInstance.frame.x = x;
+            //   symbolInstance.frame.y =  y;
+            //   symbolInstance.parent = parent;
+            //   parent.parent = page;
+            //   //document.sketchObject.inspectorController().reload()
+            //   // artboard.adjustToFit();
+            // }else if(parent.type === 'Page'){
+            //   symbolInstance.frame.x = x;
+            //   symbolInstance.frame.y = y;
+            //   symbolInstance.parent = page;
+            // }
+            // else {
+            //   console.log("拖拽到了一个非画板和页面的元素,开发者没有想到呢啊.联系程序员改bug");
+            // }
+          } else {
+            UI.message("拖拽没有移入进来。因为它没有父元素啊");
           }
         } else {
-          console.log(id + "图标找不到了");
+          UI.message(id + "图标找不到了");
         }
       } catch (error) {
         console.log(error);
       }
     });
 
-    webContents.on("getImagesByIds",async function(symbolId){
-      let images = await getImagesByIds(symbolId,COMPONENTSYMBOLS);
+    webContents.on("getImagesByIds", async function (symbolId) {
+      let images = await getImagesByIds(symbolId, COMPONENTSYMBOLS);
       webContents
-      .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
-      .catch(console.error);
+        .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
+        .catch(console.error);
     })
   }
   if (title === "upload") {
@@ -338,10 +323,28 @@ function implementFunc(browserWindow, title) {
     webContents
       .executeJavaScript(`getArtboardList(${JSON.stringify(allArtBoards)})`)
       .catch(console.error);
-      // 点击上传
-      webContents.on("uploadArtboard",function(){
-        parseSelectArtboard();
-      })
+    // 点击上传
+    webContents.on("uploadArtboard", function (ids) {
+     try {
+       console.log(ids);
+      let list = getBase64_sektchData(ids);
+      console.log(list);
+      webContents
+      .executeJavaScript(`getBase64Data(${JSON.stringify(list)})`)
+      .catch(console.error);
+     } catch (error) {
+       console.log(error);
+     }
+      //parseSelectArtboard(1);
+      // !!这部分不需要发送给webview,然后webview在走真正的上传数据库逻辑
+      // parseSelectArtboard(function(codeDSL){
+      //   console.log(codeDSL);
+      //   webContents.executeJavaScript(`getCodeDSL(${JSON.stringify(codeDSL)})`) 
+      //   .catch(console.error);
+      // });
+
+
+    })
   }
   if (title === "protocol") {
     let allLayers = getSelectedLayers();
@@ -350,26 +353,31 @@ function implementFunc(browserWindow, title) {
       .catch(console.error);
   }
   if (title === "icon") {
-    getSymbols_noImage(DESIGNICONSYMBOLS,(symbolReferences) => {
+    let iconList = [];
+    getSymbols_noImage(DESIGNICONSYMBOLS, (symbolReferences) => {
+      iconList = symbolReferences;
       webContents
-        .executeJavaScript(`getSymbols(${JSON.stringify(symbolReferences)})`)
+        .executeJavaScript(`getSymbols(${JSON.stringify(iconList)})`)
         .catch(console.error);
     });
 
-    webContents.on("getImagesByIds",async function(symbolId){
-      let images = await getImagesByIds(symbolId,DESIGNICONSYMBOLS);
+    webContents.on("getImagesByIds", async function (symbolId) {
+      let images = await getImagesByIds(symbolId, DESIGNICONSYMBOLS);
       webContents
-      .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
-      .catch(console.error);
+        .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
+        .catch(console.error);
     })
 
     // 
     webContents.on("symbolDrag", (params) => {
-      let symbolList = [];
-      let symbolReferences = [];
-      
+
       try {
-        let { symbolID, color, opacity, size } = JSON.parse(params);
+        let {
+          symbolID,
+          color,
+          opacity,
+          size
+        } = JSON.parse(params);
         let sketch = require("sketch/dom");
         let document = sketch.getSelectedDocument();
 
@@ -386,31 +394,30 @@ function implementFunc(browserWindow, title) {
           item.remove();
         });
 
-        if (symbolList.length > 0) {
-          symbolReferences = symbolList;
-        } else {
-          let libraries = require("sketch/dom").getLibraries();
+        // if (symbolList.length > 0) {
+        //   symbolReferences = symbolList;
+        // } else {
+        //   let libraries = require("sketch/dom").getLibraries();
 
-          let library = libraries.filter(
-            (item) => item.name === DESIGNICONSYMBOLS
-          )[0];
-          if (library) {
-            symbolReferences = library.getImportableSymbolReferencesForDocument(
-              document
-            );
-          }
-        }
-
-        let dragSymbol = symbolReferences.filter((item) => {
+        //   let library = libraries.filter(
+        //     (item) => item.name === DESIGNICONSYMBOLS
+        //   )[0];
+        //   if (library) {
+        //     symbolReferences = library.getImportableSymbolReferencesForDocument(
+        //       document
+        //     );
+        //   }
+        // }
+        let dragSymbol = iconList.filter((item) => {
           return item.id === symbolID;
         })[0];
 
         if (dragSymbol) {
           let page = document.selectedPage;
-          
+
           let symbolMaster = dragSymbol.import();
           let symbolInstance = symbolMaster.createNewInstance();
-          
+
           if (color) {
             symbolInstance.style.fills = [color];
           }
@@ -422,21 +429,21 @@ function implementFunc(browserWindow, title) {
             symbolInstance.frame.height = size;
           }
           if (parent) {
-              if(parent.type === 'Artboard'){
-                symbolInstance.frame.x = x;
-                symbolInstance.frame.y =  y;
-                symbolInstance.parent = parent;
-                parent.parent = page;
-                //document.sketchObject.inspectorController().reload()
-                // artboard.adjustToFit();
-              }else if(parent.type === 'Page'){
-                symbolInstance.frame.x = x;
-                symbolInstance.frame.y = y;
-                symbolInstance.parent = page;
-              }else {
-                console.log("拖拽到了一个非画板和页面的元素,开发者没有想到呢啊.联系程序员改bug");
-              }
-          } else{
+            if (parent.type === 'Artboard') {
+              symbolInstance.frame.x = x;
+              symbolInstance.frame.y = y;
+              symbolInstance.parent = parent;
+              parent.parent = page;
+              //document.sketchObject.inspectorController().reload()
+              // artboard.adjustToFit();
+            } else if (parent.type === 'Page') {
+              symbolInstance.frame.x = x;
+              symbolInstance.frame.y = y;
+              symbolInstance.parent = page;
+            } else {
+              console.log("拖拽到了一个非画板和页面的元素,开发者没有想到呢啊.联系程序员改bug");
+            }
+          } else {
             console.log("拖拽没有移入进来。因为它没有父元素啊");
           }
         } else {
@@ -452,16 +459,67 @@ function implementFunc(browserWindow, title) {
     webContents
       .executeJavaScript(`getLayersList(${JSON.stringify(allLayers)})`)
       .catch(console.error);
+
+    webContents.on('openWeb', openWeb);
+    webContents.on('openDevLibrary', openDevLibrary)
+  }
+  if (title === 'componentLibrary') {
+    let info = getSketchInfo();
+    if (info) {
+      webContents
+        .executeJavaScript(`getSketchInfo(${JSON.stringify(info)})`)
+        .catch(console.error);
+    }
+
+    webContents.on("openComponentRelevence", openComponentRelevence);
+    webContents.on('openWeb', openWeb);
   }
 }
 
-// !! 与createPanel等可以一起删除
-function implementFunc_panel(myView, title) {
-  if (title === "upload") {
-    let allArtBoards = getArtboards();
-    myView.evaluateJavaScript_completionHandler(
-      `getArtboardList(${JSON.stringify(allArtBoards)})`,
-      nil
-    );
-  }
+function openComponentRelevence() {
+  let identifier = PLUGINS_HS_PANEL_RELEVENCE;
+  // 打开对应弹框
+  let url = `${baseUrl}/componentRelevence`;
+  let width = 280;
+  let height = 635;
+  let title = 'relevence';
+  showBrowerWindowByIdentifier({
+    identifier,
+    title,
+    url,
+    width,
+    height
+  });
+}
+
+function openWeb() {
+  let identifier = PLUGINS_HS_PANEL_WEB;
+  // 打开对应弹框
+  let url = `${baseUrl}/webPlat`;
+  let width = 376;
+  let height = 652;
+  let title = 'webPlat';
+  showBrowerWindowByIdentifier({
+    identifier,
+    title,
+    url,
+    width,
+    height
+  });
+}
+
+function openDevLibrary() {
+  let identifier = PLUGINS_HS_PANEL_COMPONENT_LIBRARY;
+  // 打开对应弹框
+  let url = `${baseUrl}/componentLibrary`;
+  let width = 280;
+  let height = 635;
+  let title = 'componentLibrary';
+  showBrowerWindowByIdentifier({
+    identifier,
+    title,
+    url,
+    width,
+    height
+  });
 }
