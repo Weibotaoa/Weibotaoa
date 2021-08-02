@@ -1,7 +1,7 @@
 {
   "name": "hs-plugin",
   "description": "sketch插件",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "engines": {
     "sketch": ">=49.0"
   },
@@ -32,7 +32,6 @@
   "resources": [
     "resources/**/*.js"
   ],
-
   "repository": "https://github.com/Weibotaoa/Weibotaoa.git",
   "author": "韦博韬 <weibt36613@hundsun.com>"
 }
