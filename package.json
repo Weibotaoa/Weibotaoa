@@ -32,6 +32,7 @@
   "resources": [
     "resources/**/*.js"
   ],
+  
   "repository": "https://github.com/Weibotaoa/firstProject.git",
   "author": "韦博韬 <weibt36613@hundsun.com>"
 }
