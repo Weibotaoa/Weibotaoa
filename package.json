@@ -32,7 +32,7 @@
   "resources": [
     "resources/**/*.js"
   ],
-  
-  "repository": "https://github.com/Weibotaoa/firstProject.git",
+
+  "repository": "https://github.com/Weibotaoa/Weibotaoa.git",
   "author": "韦博韬 <weibt36613@hundsun.com>"
 }
