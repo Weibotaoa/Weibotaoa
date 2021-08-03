@@ -1,8 +1,11 @@
 import {
+  resolve
+} from "path";
+import {
   COMPONENTSYMBOLS,
   DESIGNICONSYMBOLS
 } from "./constants";
-
+import {threadDictionary} from "../util/common";
 let sketch = require("sketch");
 let dom = require("sketch/dom");
 let document = sketch.getSelectedDocument();
@@ -11,6 +14,10 @@ let DataSupplier = require("sketch/data-supplier");
 let UI = require("sketch/ui");
 let Settings = require("sketch/settings");
 let Page = sketch.Page;
+
+const {
+  promisify
+} = require("util");
 
 let componentIcons = []; //缓存基础组件列表
 let designIcons = []; // 缓存图标 列表
@@ -46,7 +53,7 @@ function getArtboards() {
                 frame: item.frame,
                 type: item.type,
                 pageId: page.id,
-                checked:item.selected
+                checked: item.selected
               };
               obj["pageInfo"] = {
                 id: page.id,
@@ -121,11 +128,11 @@ function getSelectedLayers() {
   return [];
 }
 
-function getSymbols(libraryName, callback) {
-  let sketch = require("sketch/dom");
+async function getSymbols(libraryName, callback) {
+  //let sketch = require("sketch/dom");
   // let Library = sketch.Library;
 
-  // 添加HuxBC-globalstyle-icon库
+  // //添加HuxBC-globalstyle-icon库
   // Library.getRemoteLibraryWithRSS(
   //   "https://jingwhale.github.io/sketchlibrary/globalstyle/globalstyle-icon.xml",
   //   (err, library) => {
@@ -161,7 +168,7 @@ function getSymbols(libraryName, callback) {
   // );
 
   let symbolList = [];
-  let symbolReferences = getLibraryIcons(libraryName);
+  let symbolReferences = await getLibraryIcons(libraryName);
 
   if (libraryName === COMPONENTSYMBOLS) {
     if (componentIcons.length > 0) {
@@ -184,10 +191,9 @@ function getSymbols(libraryName, callback) {
 }
 
 // 获取不带图片的symbol列表
-export function getSymbols_noImage(libraryName, callback) {
+export async function getSymbols_noImage(libraryName, callback) {
   let symbolList = [];
-  let symbolReferences = getLibraryIcons(libraryName);
-
+  let symbolReferences = await getLibraryIcons(libraryName);
   if (libraryName === COMPONENTSYMBOLS) {
     if (componentIcons.length > 0) {
       symbolReferences = componentIcons;
@@ -210,14 +216,21 @@ export function getSymbols_noImage(libraryName, callback) {
 
 // 根据ids获取symbol对应的图片列表
 async function getImagesByIds(symbolIds, libraryName) {
-  let symbolReferences = getLibraryIcons(libraryName);
+  
+  let symbolReferences = await getLibraryIcons(libraryName);
+  // console.log(symbolReferences);
+  console.log("asd");
+  
   let symbolReferenceList = symbolReferences.filter(item => symbolIds.indexOf(item.id) > -1);
+   console.log(symbolReferenceList);
   let promiseList = [];
   symbolReferenceList.forEach(symbolReference => {
     if (symbolReference) {
-      try {
+      
         promiseList.push(new Promise((resolve, reject) => {
+        
           let symbol = symbolReference.import();
+          //console.log(symbol);
           let newPage = new Page();
           newPage.parent = document;
           symbol.parent = newPage;
@@ -235,10 +248,6 @@ async function getImagesByIds(symbolIds, libraryName) {
             symboolBase64
           })
         }))
-
-      } catch (error) {
-        console.log(error);
-      }
     }
   })
   let images = await Promise.all(promiseList);
@@ -251,19 +260,50 @@ async function getImagesByIds(symbolIds, libraryName) {
 
 
 //获取图标列表
-function getLibraryIcons(libraryName) {
-  let libraries = sketch.getLibraries();
+async function getLibraryIcons(libraryName) {
+  // let libraries = sketch.getLibraries();
 
-  let library = libraries.filter((item) => item.name === libraryName)[0];
-  if (library) {
-    let document = sketch.getSelectedDocument();
-    let symbolReferences =
-      library.getImportableSymbolReferencesForDocument(document);
-    return symbolReferences;
-  } else {
-    console.log("图标库不存在");
-    return [];
-  }
+  // let library = libraries.filter((item) => item.name === libraryName)[0];
+  // if (library) {
+  //   let document = sketch.getSelectedDocument();
+  //   let symbolReferences =
+  //     library.getImportableSymbolReferencesForDocument(document);
+  //   return symbolReferences;
+  // } else {
+  //   console.log("图标库不存在");
+  //   return [];
+  // }
+  //   if(threadDictionary[libraryName]){
+  //     return  threadDictionary[libraryName] || [];
+  //   }
+    
+  
+    let sketch = require("sketch/dom");
+    let Library = sketch.Library;
+    const getRemoteLibraryWithRSS = promisify(Library.getRemoteLibraryWithRSS);
+  
+    //添加HuxBC-globalstyle-icon库
+    let url = '';
+    if (libraryName === DESIGNICONSYMBOLS) {
+      url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/globalstyle/globalstyle-icon.xml';
+    } else {
+      url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/component/component.xml';
+    }
+  
+    let library = await getRemoteLibraryWithRSS(url);
+    if (library) {
+      let document = sketch.getSelectedDocument();
+      let symbolReferences = library.getImportableSymbolReferencesForDocument(
+        document
+      );
+      // threadDictionary[libraryName] = data;
+      return symbolReferences;
+    } else {
+      console.log("图标库不存在");
+      return [];
+    }
+  
+
 }
 
 function getSymboldData_image(symbolReferences) {

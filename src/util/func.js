@@ -311,11 +311,14 @@ function implementFunc(browserWindow, title) {
       }
     });
 
-    webContents.on("getImagesByIds", async function (symbolId) {
-      let images = await getImagesByIds(symbolId, COMPONENTSYMBOLS);
-      webContents
-        .executeJavaScript(`getSymbolImage(${JSON.stringify(images)})`)
+    webContents.on("getImagesByIds",   function (symbolId) {
+      getImagesByIds(symbolId, COMPONENTSYMBOLS).then(res => {
+        console.log(res);
+        webContents
+        .executeJavaScript(`getSymbolImage(${JSON.stringify(res)})`)
         .catch(console.error);
+      });
+      
     })
   }
   if (title === "upload") {
