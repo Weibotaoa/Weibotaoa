@@ -3,17 +3,6 @@
   "bundleVersion": 1,
   "commands": [
     {
-      "name": "登录",
-      "identifier": "hs.plugins.login",
-      "script": "./login.js",
-      "handlers": {
-        "run": "onRun",
-        "actions": {
-          "Shutdown": "onShutdown"
-        }
-      }
-    },
-    {
       "name": "切换工具栏",
       "identifier": "hs.plugins.changeTool",
       "script": "./changeTool.js",
@@ -26,31 +15,12 @@
           "OpenDocument":"onOpenDocument"
         }
       }
-    },
-    {
-      "name": "刷新",
-      "identifier": "hs.plugins.refresh",
-      "script": "./refresh.js",
-      "handlers": {
-        "run": "onRun"
-      }
-    },
-    {
-      "name": "退出登录",
-      "identifier": "hs.plugins.logout",
-      "script": "./logout.js",
-      "handlers": {
-        "run": "onRun"
-      }
     }
   ],
   "menu": {
     "title": "hs-plugin",
     "items": [
-      "hs.plugins.login",
-      "hs.plugins.changeTool",
-      "hs.plugins.refresh",
-      "hs.plugins.logout"
+      "hs.plugins.changeTool"
     ]
   }
 }
