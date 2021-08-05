@@ -69,7 +69,7 @@ function switchToolBar(context, loginInfo) {
 
   // logo click event
   function logoAction() {
-    openUrlInBrowser("https://www.baidu.com/");
+    // openUrlInBrowser("https://www.baidu.com/");
   }
 
 
@@ -340,73 +340,74 @@ function switchToolBar(context, loginInfo) {
   let navList = [{
       name: "",
       action: logoAction,
-      icon: "artboard",
-      alternateIcon: "artboard-active",
+      icon: "logo",
+      alternateIcon: "logo",
       isUrl: false,
     },
     {
       name: "web端",
       action: webAction,
-      icon: "artboard",
-      alternateIcon: "artboard-active",
+      icon: "icon_web_default",
+      alternateIcon: "icon_web_active",
       isUrl: false,
     },
     {
       name: "图标",
       action: iconAction,
-      icon: "artboard",
-      alternateIcon: "artboard-active",
+      icon: "icon_design_default",
+      alternateIcon: "icon_design_active",
       isUrl: false,
     },
-    {
-      name: "协议",
-      action: protocolAction,
-      icon: "artboard",
-      alternateIcon: "artboard-active",
-      isUrl: false,
-    },
+    // {
+    //   name: "协议",
+    //   action: protocolAction,
+    //   icon: "artboard",
+    //   alternateIcon: "artboard-active",
+    //   isUrl: false,
+    // },
     {
       name: "关联",
       action: relevenceAction,
-      icon: "artboard",
-      alternateIcon: "artboard-active",
+      icon: "icon_relevence_default",
+      alternateIcon: "icon_relevence_active",
       isUrl: false,
     },
     {
       name: "上传",
       action: uploadAction,
-      icon: "artboard",
-      alternateIcon: "artboard-active",
+      icon: "icon_upload_default",
+      alternateIcon: "icon_upload_active",
       isUrl: false,
     },
     {
-      name: "组件库",
+      name: "关联库",
       action: componentLibraryAction,
-      icon: "artboard",
-      alternateIcon: "artboard-active",
+      icon: "icon_libraryRelevence_default",
+      alternateIcon: "icon_libraryRelevence_active",
       isUrl: false,
-    },
-    {
-      id: "userAvatar",
-      name: "",
-      action: avatarAction,
-      icon: "defaultAvatar",
-      alternateIcon: "defaultAvatar",
-      isUrl: false,
-    },
+    }
+    // ,
+    // {
+    //   id: "userAvatar",
+    //   name: "",
+    //   action: avatarAction,
+    //   icon: "defaultAvatar",
+    //   alternateIcon: "defaultAvatar",
+    //   isUrl: false,
+    // },
   ];
   if (!container) {
     coscript.setShouldKeepAround(true);
     container = NSBox.alloc().initWithFrame(NSMakeRect(0, 0, 10, 400));
     container.translatesAutoResizingMaskIntoConstraints = false;
-    // container.boxType = NSBoxCustom;
+    container.boxType = NSBoxCustom;
     // container.fillColor = NSColor.systemPinkColor();
 
-    container.boxType = NSBoxPrimary;
+    //container.boxType = NSBoxPrimary;
     container.fillColor = NSColor.colorWithRed_green_blue_alpha(
-      247,
-      247,
-      247,
+      53 / 255 ,
+      64 / 255,
+      79 / 255,
       1
     );
 
@@ -640,6 +641,7 @@ export function onCloseDocument() {
 }
 
 export default function (context) {
+  console.log("菜单栏显示了");
   // !! 获取用户默认设置，是否需要直接显示侧边栏  这个应该是监听文档打开事件。当文档打开的时候，创建一个侧边栏
   switchToolBar(context);
   // 监听事件 如果有登录信息则刷新则给hsInfo赋值

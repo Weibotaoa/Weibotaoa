@@ -219,10 +219,8 @@ async function getImagesByIds(symbolIds, libraryName) {
   
   let symbolReferences = await getLibraryIcons(libraryName);
   // console.log(symbolReferences);
-  console.log("asd");
   
   let symbolReferenceList = symbolReferences.filter(item => symbolIds.indexOf(item.id) > -1);
-   console.log(symbolReferenceList);
   let promiseList = [];
   symbolReferenceList.forEach(symbolReference => {
     if (symbolReference) {

@@ -86,6 +86,13 @@ export class InitContext {
     button.setAction("onClickListener:");
     button.setCOSJSTargetFunction(onClickListener);
 
+    // 设置按钮字体颜色
+    let color = NSColor.whiteColor()
+    let colorTitle = NSMutableAttributedString.new().initWithAttributedString(button.attributedTitle())
+    let range = NSMakeRange(0, colorTitle.length())
+    colorTitle.addAttribute_value_range(NSForegroundColorAttributeName, color, range)
+    button.attributedTitle = colorTitle
+
     // button.alternateTitle = '变了';
 
     // let font = NSFont.systemFontOfSize(12);
@@ -160,6 +167,7 @@ function clearOthersWindow(currentIdentifier) {
 }
 
 function showBrowerWindowByIdentifier(params) {
+  console.log("函数被调用了吧");
   let {
     title,
     width,
@@ -179,6 +187,7 @@ function showBrowerWindowByIdentifier(params) {
     implementFunc(browserWindow, title);
     browserWindow.loadURL(url);
     threadDictionary[identifier] = browserWindow;
+    
   } catch (error) {
     console.log(error);
   }
@@ -197,6 +206,7 @@ export function toogleBrowerWindow(
   clearOthersWindow(identifier); // 清除掉放在数组里面的除了自己之外的所有window
   //  登录弹框用browserWindow，功能弹框用panel
   let browserWindow = threadDictionary[identifier];
+  console.log(browserWindow);
   if (!browserWindow) {
     browserWindow = createBrowerWindow({
       source,
@@ -311,14 +321,14 @@ function implementFunc(browserWindow, title) {
       }
     });
 
-    webContents.on("getImagesByIds",   function (symbolId) {
+    webContents.on("getImagesByIds", function (symbolId) {
       getImagesByIds(symbolId, COMPONENTSYMBOLS).then(res => {
         console.log(res);
         webContents
-        .executeJavaScript(`getSymbolImage(${JSON.stringify(res)})`)
-        .catch(console.error);
+          .executeJavaScript(`getSymbolImage(${JSON.stringify(res)})`)
+          .catch(console.error);
       });
-      
+
     })
   }
   if (title === "upload") {
@@ -328,16 +338,16 @@ function implementFunc(browserWindow, title) {
       .catch(console.error);
     // 点击上传
     webContents.on("uploadArtboard", function (ids) {
-     try {
-       console.log(ids);
-      let list = getBase64_sektchData(ids);
-      console.log(list);
-      webContents
-      .executeJavaScript(`getBase64Data(${JSON.stringify(list)})`)
-      .catch(console.error);
-     } catch (error) {
-       console.log(error);
-     }
+      try {
+        console.log(ids);
+        let list = getBase64_sektchData(ids);
+        console.log(list);
+        webContents
+          .executeJavaScript(`getBase64Data(${JSON.stringify(list)})`)
+          .catch(console.error);
+      } catch (error) {
+        console.log(error);
+      }
       //parseSelectArtboard(1);
       // !!这部分不需要发送给webview,然后webview在走真正的上传数据库逻辑
       // parseSelectArtboard(function(codeDSL){

@@ -56,7 +56,7 @@ export const createBoxSeparator = () => {
   const separtorBox = NSBox.alloc().initWithFrame(NSZeroRect);
   // Specifies that the box is a separator
   separtorBox.setBoxType(2 || NSBoxSeparator);
-  separtorBox.setBorderColor(NSColor.colorWithHex("#E6E6E6"));
+  separtorBox.setBorderColor(NSColor.colorWithHex("#19212B"));
   try {
     separtorBox.setBorderColor(
       NSColor.colorWithSRGBRed_green_blue_alpha(1.0, 1.0, 1.0, 1.0)
@@ -250,7 +250,7 @@ export const createBrowerWindow = (params) => {
 
   COScript.currentCOScript().setShouldKeepAround(true);
   const threadDictionary = NSThread.mainThread().threadDictionary();
-  const browserWindow = new BrowserWindow(options);
+  let browserWindow = new BrowserWindow(options);
   browserWindow.center();
   // threadDictionary[options.identifier] = browserWindow;
   let window = NSApp.mainWindow();
@@ -266,6 +266,9 @@ export const createBrowerWindow = (params) => {
   browserWindow.once("ready-to-show", () => {
     browserWindow.show();
   });
+  browserWindow.on('closed',() => {
+    browserWindow = null;
+  })
   return browserWindow;
 };
 
