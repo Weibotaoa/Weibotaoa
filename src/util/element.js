@@ -261,11 +261,11 @@ export const createBrowerWindow = (params) => {
   let relativeToApp = sidebar.superview().frame();
   let pos = window.convertPointToScreen(relativeToApp.origin)
   browserWindow.setSize(params.width, params.height);
-  browserWindow.setPosition(pos.x - params.width, pos.y);
+  browserWindow.setPosition(pos.x - params.width, pos.y,true);
   browserWindow.setMovable(true);
-  browserWindow.once("ready-to-show", () => {
-    browserWindow.show();
-  });
+  // browserWindow.once("ready-to-show", () => {
+  //   browserWindow.show();
+  // });
   browserWindow.on('closed',() => {
     browserWindow = null;
   })

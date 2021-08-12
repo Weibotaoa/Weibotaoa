@@ -100,12 +100,18 @@ function getBase64_sektchData(ids) {
   ids = JSON.parse(ids);
   ids.map(artboardId => {
     let artboard = sketch.find('Artboard,[id="' + artboardId + '"]');
-    let buffer = sketch.export(artboard[0], {
-      formats: 'png',
-      output: false
-    });
-    let artboardBase64 = `data:image/png;base64,${buffer.toString("base64")}`;
+    let artboardBase64 = miniImage(artboard[0]);
+    // let buffer = sketch.export(artboard[0], {
+    //   formats: 'png',
+    //   output: false
+    // });
+    // let artboardBase64 = `data:image/png;base64,${buffer.toString("base64")}`;
+   
+    // console.log(artboardData);
+    console.log("上面是数据");
+
     let artboardData = JSON.parse(JSON.stringify(artboard));
+    // let artboardData = '123';
     arr.push({
       artboardId,
       artboardBase64,
@@ -346,6 +352,36 @@ function getSketchInfo() {
     return null;
   }
 
+
+}
+
+
+function miniImage(selection){
+// let sketch = require('sketch')
+// let doc = sketch.getSelectedDocument()
+// let selection = doc.selectedLayers.layers[0]
+
+let Slice = sketch.Slice
+let exportSlice = new Slice({
+  frame: selection.frame,
+  parent: selection.parent
+})
+
+let shrinkedSlice = shrinkSlice_by(exportSlice,30)
+
+function shrinkSlice_by(slice,value) {
+  let frame = slice.frame
+  frame.x = frame.x + value
+  frame.y = frame.y + value
+  frame.width = frame.width - (value*2)
+  frame.height = frame.height - (value*2)
+  slice.frame = frame
+  return slice
+}
+
+let buffer = sketch.export(shrinkedSlice, { formats: 'png' ,output:false});
+exportSlice.parent = null
+ return `data:image/png;base64,${buffer.toString("base64")}`;
 
 }
 

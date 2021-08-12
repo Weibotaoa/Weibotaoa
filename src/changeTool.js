@@ -15,7 +15,8 @@ import {
 } from "./util/func";
 import {
   getSelectedLayers,
-  getArtboards
+  getArtboards,
+  getSketchInfo
 } from './util/base';
 import {
   PLUGIN_HS_SIDEBAR,
@@ -560,11 +561,13 @@ function changeUpload() {
   let browserWindow = threadDictionary[PLUGINS_HS_PANEL_UPLOAD];
   if (browserWindow) {
     const webContents = browserWindow.webContents;
-    let allArtBoards = getArtboards();
+    let artboardList = getArtboards();
+    let info = getSketchInfo();
+    
     // console.log("监听了画板改变");
     // console.log(allArtBoards);
     webContents
-      .executeJavaScript(`getArtboardList(${JSON.stringify(allArtBoards)})`)
+      .executeJavaScript(`getArtboardList(${JSON.stringify(info,artboardList)})`)
       .catch(console.error);
   }
 }
@@ -575,8 +578,9 @@ function changeRelevence() {
   if (browserWindow) {
     const webContents = browserWindow.webContents;
     let allLayers = getSelectedLayers();
+    let info = getSketchInfo();
     webContents
-      .executeJavaScript(`getLayersList(${JSON.stringify(allLayers)})`)
+      .executeJavaScript(`getLayersList(${JSON.stringify({allLayers,info})})`)
       .catch(console.error);
   }
 }
@@ -641,7 +645,7 @@ export function onCloseDocument() {
 }
 
 export default function (context) {
-  console.log("菜单栏显示了");
+  console.log("菜单栏显示了")
   // !! 获取用户默认设置，是否需要直接显示侧边栏  这个应该是监听文档打开事件。当文档打开的时候，创建一个侧边栏
   switchToolBar(context);
   // 监听事件 如果有登录信息则刷新则给hsInfo赋值

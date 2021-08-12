@@ -167,7 +167,6 @@ function clearOthersWindow(currentIdentifier) {
 }
 
 function showBrowerWindowByIdentifier(params) {
-  console.log("函数被调用了吧");
   let {
     title,
     width,
@@ -206,7 +205,6 @@ export function toogleBrowerWindow(
   clearOthersWindow(identifier); // 清除掉放在数组里面的除了自己之外的所有window
   //  登录弹框用browserWindow，功能弹框用panel
   let browserWindow = threadDictionary[identifier];
-  console.log(browserWindow);
   if (!browserWindow) {
     browserWindow = createBrowerWindow({
       source,
@@ -323,7 +321,6 @@ function implementFunc(browserWindow, title) {
 
     webContents.on("getImagesByIds", function (symbolId) {
       getImagesByIds(symbolId, COMPONENTSYMBOLS).then(res => {
-        console.log(res);
         webContents
           .executeJavaScript(`getSymbolImage(${JSON.stringify(res)})`)
           .catch(console.error);
@@ -332,16 +329,19 @@ function implementFunc(browserWindow, title) {
     })
   }
   if (title === "upload") {
-    let allArtBoards = getArtboards();
+    // 查看设计
+    webContents.on('lookDesign',() => {
+      openUrlInBrowser("http://10.20.145.85:8088/frame-layout/D2CPlatform/#/plat/pageManager");
+    })
+    let artboardList = getArtboards();
+    let info = getSketchInfo();
     webContents
-      .executeJavaScript(`getArtboardList(${JSON.stringify(allArtBoards)})`)
+      .executeJavaScript(`getArtboardList(${JSON.stringify({info,artboardList})})`)
       .catch(console.error);
     // 点击上传
     webContents.on("uploadArtboard", function (ids) {
       try {
-        console.log(ids);
         let list = getBase64_sektchData(ids);
-        console.log(list);
         webContents
           .executeJavaScript(`getBase64Data(${JSON.stringify(list)})`)
           .catch(console.error);
@@ -469,9 +469,12 @@ function implementFunc(browserWindow, title) {
   }
   if (title === "relevence") {
     let allLayers = getSelectedLayers();
+    let info = getSketchInfo();
+   
     webContents
-      .executeJavaScript(`getLayersList(${JSON.stringify(allLayers)})`)
+      .executeJavaScript(`getLayersList(${JSON.stringify({allLayers,info})})`)
       .catch(console.error);
+
 
     webContents.on('openWeb', openWeb);
     webContents.on('openDevLibrary', openDevLibrary)
