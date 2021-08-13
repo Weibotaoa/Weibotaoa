@@ -1,7 +1,7 @@
 /*
  * @Author: wbt
  * @Date: 2021-04-07 22:52:37
- * @LastEditTime: 2021-07-20 16:24:06
+ * @LastEditTime: 2021-08-12 19:22:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /sketch/hs-plugin/src/util/constants.js
@@ -10,8 +10,9 @@ let str = '';
 if(NSApp.mainWindow()){
     str = (NSApp.mainWindow()+"").split(":")[1].trim();
 }
+console.log(NSApp.mainWindow());
+console.log("这是啥啊");
 let PLUGIN_HS_SIDEBAR = str === '' ? '' :  str.slice(0,str.length - 1); // 插件的侧边导航栏标识符
-
 const PLUGINS_HS_LOGIN =  'com.plugins.hs.login'; // 登录的webview标识符
 const PLUGINS_HS_USERINFO = 'com.plugins.hs.userInfo'; // 登录插件的信息
 
