@@ -16,7 +16,8 @@ import {
 import {
   getSelectedLayers,
   getArtboards,
-  getSketchInfo
+  getSketchInfo,
+  isSymbolMaster
 } from './util/base';
 import {
   PLUGIN_HS_SIDEBAR,
@@ -449,10 +450,15 @@ function switchToolBar(context, loginInfo) {
     });
 
     // Put buttons in a stack view
-    const stack = NSStackView.stackViewWithViews(buttons);
+    let stack = NSStackView.stackViewWithViews(buttons);
+
+    // let stack = UILayoutGuide.alloc().init();
+    // layoutGuide.addLayoutGuide(buttons)
+
+
     stack.spacing = 25; // 每个元素的间隔
     stack.orientation = NSUserInterfaceLayoutOrientationVertical; // NS用户界面布局方向垂直
-    stack.edgeInsets = NSEdgeInsetsMake(10, 0, 0, 0); // 与顶部的距离是10
+    stack.edgeInsets = NSEdgeInsetsMake(80, 0, 0, 0); // 与顶部的距离是10
 
     // Add stack view to main container view
     container.addSubview(stack);
@@ -472,9 +478,13 @@ function switchToolBar(context, loginInfo) {
     );
 
     container.addConstraints(horizontalConstraints);
+    // console.log("123");
+    // console.log(container);
+
+    
     stack
       .topAnchor()
-      .constraintEqualToAnchor(container.safeAreaLayoutGuide().topAnchor())
+      .constraintEqualToAnchor(container.topAnchor())
       .setActive(true);
     // ----------
 
@@ -567,7 +577,7 @@ function changeUpload() {
     // console.log("监听了画板改变");
     // console.log(allArtBoards);
     webContents
-      .executeJavaScript(`getArtboardList(${JSON.stringify(info,artboardList)})`)
+      .executeJavaScript(`getArtboardList(${JSON.stringify({info,artboardList})})`)
       .catch(console.error);
   }
 }
@@ -579,8 +589,9 @@ function changeRelevence() {
     const webContents = browserWindow.webContents;
     let allLayers = getSelectedLayers();
     let info = getSketchInfo();
+    let isSymbolMasterLibrary = isSymbolMaster();
     webContents
-      .executeJavaScript(`getLayersList(${JSON.stringify({allLayers,info})})`)
+      .executeJavaScript(`getLayersList(${JSON.stringify({allLayers,info,isSymbolMasterLibrary})})`)
       .catch(console.error);
   }
 }

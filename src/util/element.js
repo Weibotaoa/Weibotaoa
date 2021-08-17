@@ -255,13 +255,13 @@ export const createBrowerWindow = (params) => {
   // threadDictionary[options.identifier] = browserWindow;
   let window = NSApp.mainWindow();
   browserWindow.setAlwaysOnTop(true);
-  browserWindow.isMovable(true);
+  browserWindow.isMovable(false);
   let sidebar = threadDictionary[PLUGIN_HS_SIDEBAR];
   //侧边栏相对app的x坐标
   let relativeToApp = sidebar.superview().frame();
   let pos = window.convertPointToScreen(relativeToApp.origin)
   browserWindow.setSize(params.width, params.height);
-  browserWindow.setPosition(pos.x - params.width, pos.y,true);
+  browserWindow.setPosition(pos.x - params.width, pos.y);
   browserWindow.setMovable(true);
   // browserWindow.once("ready-to-show", () => {
   //   browserWindow.show();

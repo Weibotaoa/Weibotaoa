@@ -5,7 +5,9 @@ import {
   COMPONENTSYMBOLS,
   DESIGNICONSYMBOLS
 } from "./constants";
-import {threadDictionary} from "../util/common";
+import {
+  threadDictionary
+} from "../util/common";
 let sketch = require("sketch");
 let dom = require("sketch/dom");
 let document = sketch.getSelectedDocument();
@@ -98,6 +100,7 @@ function getSelectefArtboardIds() {
 function getBase64_sektchData(ids) {
   let arr = [];
   ids = JSON.parse(ids);
+  console.log(ids);
   ids.map(artboardId => {
     let artboard = sketch.find('Artboard,[id="' + artboardId + '"]');
     let artboardBase64 = miniImage(artboard[0]);
@@ -106,7 +109,7 @@ function getBase64_sektchData(ids) {
     //   output: false
     // });
     // let artboardBase64 = `data:image/png;base64,${buffer.toString("base64")}`;
-   
+
     // console.log(artboardData);
     console.log("上面是数据");
 
@@ -222,36 +225,36 @@ export async function getSymbols_noImage(libraryName, callback) {
 
 // 根据ids获取symbol对应的图片列表
 async function getImagesByIds(symbolIds, libraryName) {
-  
+
   let symbolReferences = await getLibraryIcons(libraryName);
   // console.log(symbolReferences);
-  
+
   let symbolReferenceList = symbolReferences.filter(item => symbolIds.indexOf(item.id) > -1);
   let promiseList = [];
   symbolReferenceList.forEach(symbolReference => {
     if (symbolReference) {
-      
-        promiseList.push(new Promise((resolve, reject) => {
-        
-          let symbol = symbolReference.import();
-          //console.log(symbol);
-          let newPage = new Page();
-          newPage.parent = document;
-          symbol.parent = newPage;
-          let options = {
-            formats: "png",
-            output: false
-          };
-          let buffer = sketch.export(symbol, options);
-          let symboolBase64 = buffer.toString("base64");
-          // images.push({id:symbol.id,symboolBase64})
-          newPage.parent = nil; // 删除掉当前页面
-          newPage.remove();
-          resolve({
-            id: symbolReference.id,
-            symboolBase64
-          })
-        }))
+
+      promiseList.push(new Promise((resolve, reject) => {
+
+        let symbol = symbolReference.import();
+        //console.log(symbol);
+        let newPage = new Page();
+        newPage.parent = document;
+        symbol.parent = newPage;
+        let options = {
+          formats: "png",
+          output: false
+        };
+        let buffer = sketch.export(symbol, options);
+        let symboolBase64 = buffer.toString("base64");
+        // images.push({id:symbol.id,symboolBase64})
+        newPage.parent = nil; // 删除掉当前页面
+        newPage.remove();
+        resolve({
+          id: symbolReference.id,
+          symboolBase64
+        })
+      }))
     }
   })
   let images = await Promise.all(promiseList);
@@ -280,33 +283,33 @@ async function getLibraryIcons(libraryName) {
   //   if(threadDictionary[libraryName]){
   //     return  threadDictionary[libraryName] || [];
   //   }
-    
-  
-    let sketch = require("sketch/dom");
-    let Library = sketch.Library;
-    const getRemoteLibraryWithRSS = promisify(Library.getRemoteLibraryWithRSS);
-  
-    //添加HuxBC-globalstyle-icon库
-    let url = '';
-    if (libraryName === DESIGNICONSYMBOLS) {
-      url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/globalstyle/globalstyle-icon.xml';
-    } else {
-      url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/component/component.xml';
-    }
-  
-    let library = await getRemoteLibraryWithRSS(url);
-    if (library) {
-      let document = sketch.getSelectedDocument();
-      let symbolReferences = library.getImportableSymbolReferencesForDocument(
-        document
-      );
-      // threadDictionary[libraryName] = data;
-      return symbolReferences;
-    } else {
-      console.log("图标库不存在");
-      return [];
-    }
-  
+
+
+  let sketch = require("sketch/dom");
+  let Library = sketch.Library;
+  const getRemoteLibraryWithRSS = promisify(Library.getRemoteLibraryWithRSS);
+
+  //添加HuxBC-globalstyle-icon库
+  let url = '';
+  if (libraryName === DESIGNICONSYMBOLS) {
+    url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/globalstyle/globalstyle-icon.xml';
+  } else {
+    url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/component/component.xml';
+  }
+
+  let library = await getRemoteLibraryWithRSS(url);
+  if (library) {
+    let document = sketch.getSelectedDocument();
+    let symbolReferences = library.getImportableSymbolReferencesForDocument(
+      document
+    );
+    // threadDictionary[libraryName] = data;
+    return symbolReferences;
+  } else {
+    console.log("图标库不存在");
+    return [];
+  }
+
 
 }
 
@@ -356,34 +359,61 @@ function getSketchInfo() {
 }
 
 
-function miniImage(selection){
-// let sketch = require('sketch')
-// let doc = sketch.getSelectedDocument()
-// let selection = doc.selectedLayers.layers[0]
+function miniImage(selection) {
+  // let sketch = require('sketch')
+  // let doc = sketch.getSelectedDocument()
+  // let selection = doc.selectedLayers.layers[0]
 
-let Slice = sketch.Slice
-let exportSlice = new Slice({
-  frame: selection.frame,
-  parent: selection.parent
-})
+  let Slice = sketch.Slice
+  let exportSlice = new Slice({
+    frame: selection.frame,
+    parent: selection.parent
+  })
 
-let shrinkedSlice = shrinkSlice_by(exportSlice,30)
+  let shrinkedSlice = shrinkSlice_by(exportSlice, 30)
 
-function shrinkSlice_by(slice,value) {
-  let frame = slice.frame
-  frame.x = frame.x + value
-  frame.y = frame.y + value
-  frame.width = frame.width - (value*2)
-  frame.height = frame.height - (value*2)
-  slice.frame = frame
-  return slice
+  function shrinkSlice_by(slice, value) {
+    let frame = slice.frame
+    frame.x = frame.x + value
+    frame.y = frame.y + value
+    frame.width = frame.width - (value * 2)
+    frame.height = frame.height - (value * 2)
+    slice.frame = frame
+    return slice
+  }
+
+  let buffer = sketch.export(shrinkedSlice, {
+    formats: 'png',
+    output: false
+  });
+  exportSlice.parent = null
+  return `data:image/png;base64,${buffer.toString("base64")}`;
+
 }
 
-let buffer = sketch.export(shrinkedSlice, { formats: 'png' ,output:false});
-exportSlice.parent = null
- return `data:image/png;base64,${buffer.toString("base64")}`;
 
+
+// 判断是否是控件页  
+function isSymbolMaster() {
+  let flag = false;
+  let sketch = require('sketch')
+  let doc = sketch.getSelectedDocument()
+  let pages = doc.pages
+
+  let page = pages.filter(item => item.selected === true)[0];
+  let list = page.layers;
+  for (let i in list) {
+    if (list[i].type === 'SymbolMaster') {
+      flag = true;
+      break;
+    }
+  }
+  return flag;
 }
+
+
+
+
 
 export {
   getArtboards,
@@ -392,5 +422,6 @@ export {
   getImagesByIds,
   getSketchInfo,
   getBase64_sektchData,
-  getSelectefArtboardIds
+  getSelectefArtboardIds,
+  isSymbolMaster
 };

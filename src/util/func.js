@@ -13,7 +13,8 @@ import {
   getSymbols_noImage,
   getImagesByIds,
   getSketchInfo,
-  getBase64_sektchData
+  getBase64_sektchData,
+  isSymbolMaster
 } from "./base";
 import {
   DESIGNICONSYMBOLS,
@@ -233,6 +234,7 @@ function implementFunc(browserWindow, title) {
     getSymbols_noImage(COMPONENTSYMBOLS, (symbolReferences) => {
       // let list = symbolReferences.filter(item => item.symbolReference.name.indexOf("common") < 0);
       componentList = symbolReferences.filter(item => item.name.indexOf("common") < 0);
+     
       webContents
         .executeJavaScript(`getSymbols(${JSON.stringify(componentList)})`)
         .catch(console.error);
@@ -470,9 +472,10 @@ function implementFunc(browserWindow, title) {
   if (title === "relevence") {
     let allLayers = getSelectedLayers();
     let info = getSketchInfo();
+    let isSymbolMasterLibrary = isSymbolMaster();
    
     webContents
-      .executeJavaScript(`getLayersList(${JSON.stringify({allLayers,info})})`)
+      .executeJavaScript(`getLayersList(${JSON.stringify({allLayers,info,isSymbolMasterLibrary})})`)
       .catch(console.error);
 
 

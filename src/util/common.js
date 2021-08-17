@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-04-01 16:33:02
- * @LastEditTime: 2021-08-13 11:08:56
+ * @LastEditTime: 2021-08-17 17:50:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /sketch/hs-plugin/src/util/common.js
@@ -14,7 +14,7 @@ import { PLUGINS_HS_LOGIN,PLUGINS_HS_USERINFO } from './constants';
 import UI from 'sketch/ui'
 
  //let baseUrl = 'http://localhost:8008/#/webview';
- let baseUrl = 'http://10.20.145.85:8008/#/webview';
+  let baseUrl = 'http://10.20.145.85:8008/#/webview';
 // 线程字典
 let threadDictionary = NSThread.mainThread().threadDictionary();
 
