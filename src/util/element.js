@@ -143,7 +143,6 @@ export const createPanel = (params) => {
   // panel.cascadeTopLeftFromPoint(CGPointMake(2200,700));
 
   let mousePos = NSEvent.mouseLocation(); // !! 这个api终于找到了，真的是太猛了，又学到一招
-  console.log(mousePos);
   // let locationInWindow = NSEvent.locationInWindow();
   // let localPoint = locationInWindow.convertPoint_formView(mousePos,params.source);
   // console.log(localPoint);
@@ -157,8 +156,9 @@ export const createPanel = (params) => {
     true
   );
   panel.standardWindowButton(params.source);
-  panel.makeKeyAndOrderFront(null);
-  panel.setLevel(NSFloatingWindowLevel);
+  panel.makeKeyAndOrderFront(nil);
+  window.setLevel(CGWindowLevelForKey(kCGMaximumWindowLevelKey));
+  // panel.setLevel(NSFloatingWindowLevel);
   panel.minSize = NSMakeSize(options.minWidth, options.minHeight);
 
   panel.titlebarAppearsTransparent = false; // panel的title是否显示
@@ -250,11 +250,13 @@ export const createBrowerWindow = (params) => {
 
   COScript.currentCOScript().setShouldKeepAround(true);
   const threadDictionary = NSThread.mainThread().threadDictionary();
+  
   let browserWindow = new BrowserWindow(options);
   browserWindow.center();
   // threadDictionary[options.identifier] = browserWindow;
   let window = NSApp.mainWindow();
-  browserWindow.setAlwaysOnTop(true);
+  browserWindow.setAlwaysOnTop(false);
+  browserWindow.acceptFirstMouse = true;
   browserWindow.isMovable(false);
   let sidebar = threadDictionary[PLUGIN_HS_SIDEBAR];
   //侧边栏相对app的x坐标

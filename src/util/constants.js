@@ -1,7 +1,7 @@
 /*
  * @Author: wbt
  * @Date: 2021-04-07 22:52:37
- * @LastEditTime: 2021-08-12 19:22:18
+ * @LastEditTime: 2021-08-18 13:35:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /sketch/hs-plugin/src/util/constants.js
@@ -28,6 +28,7 @@ const PLUGINS_HS_PANEL_RELEVENCE = 'com.plugins.hs.menu.relevence'; //右侧导�
 const PLUGINS_HS_PANEL_COMPONENT_LIBRARY = 'com.plugins.hs.menu.componentLibrary'; //右侧导航栏关联库显示的panel的标识符
 const COMPONENTSYMBOLS = 'HuxBC-component'; // 基础组件库名称
 const DESIGNICONSYMBOLS = 'HuxBC-globalstyle-icon'; // 图标库名
+const FRAMEWORKSYMBOLS = 'HuxBC-framework'; // 导航框架名称
 
 
 export {
@@ -42,6 +43,7 @@ export {
     PLUGINS_HS_PANEL_RELEVENCE,
     PLUGINS_HS_PANEL_COMPONENT_LIBRARY,
     COMPONENTSYMBOLS,
-    DESIGNICONSYMBOLS
+    DESIGNICONSYMBOLS,
+    FRAMEWORKSYMBOLS
 };
 

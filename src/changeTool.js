@@ -540,7 +540,7 @@ function switchToolBar(context, loginInfo) {
   } else {
     container.remove();
     container.parentView = nil;
-    UI.message("else的事件");
+    // UI.message("else的事件");
     // coscript.setShouldKeepAround(false);
     //  threadDictionary["replace_stackview"].hidden = true;
     // container.hidden = !container.hidden;
@@ -557,11 +557,11 @@ function switchToolBar(context, loginInfo) {
 }
 
 export function onStartup() {
-  UI.message("该命令生效了");
+  // UI.message("该命令生效了");
 }
 
 export function onArtboardChanged() {
-  UI.message("画板有改变");
+  // UI.message("画板有改变");
   changeRelevence();
   changeUpload();
 }

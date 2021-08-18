@@ -18,7 +18,8 @@ import {
 } from "./base";
 import {
   DESIGNICONSYMBOLS,
-  COMPONENTSYMBOLS
+  COMPONENTSYMBOLS,
+  FRAMEWORKSYMBOLS
 } from "./constants";
 // import { parseSelectArtboard } from "../util/parseArtboard/init";
 import {
@@ -126,7 +127,6 @@ export class InitContext {
     // console.log( this.pluginSketch.URLByAppendingPathComponent('Contents'));
 
     var imageURL = this.pluginSketch.URLByAppendingPathComponent("".concat(name, ".png"));
-    console.log(imageURL);
     var image = NSImage.alloc().initWithContentsOfURL(imageURL);
     size && image.setSize(size);
     image.setScalesWhenResized = true;
@@ -230,105 +230,8 @@ function implementFunc(browserWindow, title) {
   // });
   const webContents = browserWindow.webContents;
   if (title === 'webPlat') {
-    let componentList = [];
-    getSymbols_noImage(COMPONENTSYMBOLS, (symbolReferences) => {
-      // let list = symbolReferences.filter(item => item.symbolReference.name.indexOf("common") < 0);
-      componentList = symbolReferences.filter(item => item.name.indexOf("common") < 0);
-     
-      webContents
-        .executeJavaScript(`getSymbols(${JSON.stringify(componentList)})`)
-        .catch(console.error);
-    });
-    webContents.on("componentDrag", (id) => {
-
-
-      try {
-        let sketch = require("sketch/dom");
-        let document = sketch.getSelectedDocument();
-
-        // 清除移进来的位图
-        let image = sketch.find("Image,[name='位图']");
-        let x = 0;
-        let y = 0;
-        let parent = null;
-        image.forEach((item) => {
-          parent = item.parent;
-          x = item.frame.x;
-          y = item.frame.y;
-          item.parent = nil;
-          item.remove();
-        });
-
-        // if (symbolList.length > 0) {
-        //   symbolReferences = symbolList;
-        // } else {
-        //   let libraries = require("sketch/dom").getLibraries();
-
-        //   let library = libraries.filter(
-        //     (item) => item.name === COMPONENTSYMBOLS
-        //   )[0];
-        //   if (library) {
-        //     symbolReferences = library.getImportableSymbolReferencesForDocument(
-        //       document
-        //     );
-        //   }
-        // }
-
-        let dragSymbol = componentList.filter((item) => {
-          return item.id === id;
-        })[0];
-
-        if (dragSymbol) {
-          let page = document.selectedPage;
-
-          let symbolMaster = dragSymbol.import();
-          let symbolInstance = symbolMaster.createNewInstance();
-
-          if (parent) {
-            if (parent.type === 'Page') {
-              symbolInstance.frame.x = x;
-              symbolInstance.frame.y = y;
-              symbolInstance.parent = page;
-            } else {
-              symbolInstance.frame.x = x;
-              symbolInstance.frame.y = y;
-              symbolInstance.parent = parent;
-              parent.parent = page;
-            }
-            // if(parent.type === 'Artboard'){
-            //   symbolInstance.frame.x = x;
-            //   symbolInstance.frame.y =  y;
-            //   symbolInstance.parent = parent;
-            //   parent.parent = page;
-            //   //document.sketchObject.inspectorController().reload()
-            //   // artboard.adjustToFit();
-            // }else if(parent.type === 'Page'){
-            //   symbolInstance.frame.x = x;
-            //   symbolInstance.frame.y = y;
-            //   symbolInstance.parent = page;
-            // }
-            // else {
-            //   console.log("拖拽到了一个非画板和页面的元素,开发者没有想到呢啊.联系程序员改bug");
-            // }
-          } else {
-            UI.message("拖拽没有移入进来。因为它没有父元素啊");
-          }
-        } else {
-          UI.message(id + "图标找不到了");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    webContents.on("getImagesByIds", function (symbolId) {
-      getImagesByIds(symbolId, COMPONENTSYMBOLS).then(res => {
-        webContents
-          .executeJavaScript(`getSymbolImage(${JSON.stringify(res)})`)
-          .catch(console.error);
-      });
-
-    })
+    handleWebComponent(webContents,COMPONENTSYMBOLS);
+    handleWebFramework(webContents,FRAMEWORKSYMBOLS)
   }
   if (title === "upload") {
     // 查看设计
@@ -541,4 +444,218 @@ function openDevLibrary() {
     width,
     height
   });
+}
+
+function handleWebComponent(webContents,navName){
+  let componentList = [];
+
+  getSymbols_noImage(navName, (symbolReferences) => {
+    // let list = symbolReferences.filter(item => item.symbolReference.name.indexOf("common") < 0);
+    componentList = symbolReferences.filter(item => item.name.indexOf("common") < 0);
+      webContents
+      .executeJavaScript(`getSymbols(${JSON.stringify(componentList)})`)
+      .catch(console.error);
+  })
+    
+    webContents.on("componentDrag", (id) => {
+
+
+      try {
+        let sketch = require("sketch/dom");
+        let document = sketch.getSelectedDocument();
+
+        // 清除移进来的位图
+        let image = sketch.find("Image,[name='位图']");
+        let x = 0;
+        let y = 0;
+        let parent = null;
+        image.forEach((item) => {
+          parent = item.parent;
+          console.log("有啊");
+          console.log(parent);
+          x = item.frame.x;
+          y = item.frame.y;
+          item.parent = nil;
+          item.remove();
+        });
+
+        console.log("是不是");
+        console.log(parent);
+
+        // if (symbolList.length > 0) {
+        //   symbolReferences = symbolList;
+        // } else {
+        //   let libraries = require("sketch/dom").getLibraries();
+
+        //   let library = libraries.filter(
+        //     (item) => item.name === COMPONENTSYMBOLS
+        //   )[0];
+        //   if (library) {
+        //     symbolReferences = library.getImportableSymbolReferencesForDocument(
+        //       document
+        //     );
+        //   }
+        // }
+
+        console.log("数据啊");
+        console.log(componentList);
+        console.log(id)
+
+        let dragSymbol  = componentList.filter((item) => {
+          return item.id === id;
+        })[0];
+        
+
+        if (dragSymbol) {
+          let page = document.selectedPage;
+
+          let symbolMaster = dragSymbol.import();
+          let symbolInstance = symbolMaster.createNewInstance();
+          if (parent) {
+            if (parent.type === 'Page') {
+              symbolInstance.frame.x = x;
+              symbolInstance.frame.y = y;
+              symbolInstance.parent = page;
+            } else {
+              symbolInstance.frame.x = x;
+              symbolInstance.frame.y = y;
+              symbolInstance.parent = parent;
+              parent.parent = page;
+            }
+            // if(parent.type === 'Artboard'){
+            //   symbolInstance.frame.x = x;
+            //   symbolInstance.frame.y =  y;
+            //   symbolInstance.parent = parent;
+            //   parent.parent = page;
+            //   //document.sketchObject.inspectorController().reload()
+            //   // artboard.adjustToFit();
+            // }else if(parent.type === 'Page'){
+            //   symbolInstance.frame.x = x;
+            //   symbolInstance.frame.y = y;
+            //   symbolInstance.parent = page;
+            // }
+            // else {
+            //   console.log("拖拽到了一个非画板和页面的元素,开发者没有想到呢啊.联系程序员改bug");
+            // }
+          } else {
+            UI.message("拖拽没有移入进来。因为它没有父元素啊");
+          }
+        } else {
+          UI.message(id + "图标找不到了");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    webContents.on("getImagesByIds", function (symbolId) {
+      getImagesByIds(symbolId, navName).then(res => {
+        webContents
+          .executeJavaScript(`getSymbolImage(${JSON.stringify(res)})`)
+          .catch(console.error);
+      });
+
+    })
+}
+
+
+function handleWebFramework(webContents,navName){
+  let componentList = [];
+  getSymbols(navName,(symbolReferences) => {
+    componentList = symbolReferences;
+    webContents
+    .executeJavaScript(`getSymbols_framework(${JSON.stringify(componentList)})`)
+    .catch(console.error);
+  })
+
+  webContents.on("frameworkDrag", (id) => {
+
+    try {
+      let sketch = require("sketch/dom");
+      let document = sketch.getSelectedDocument();
+
+      // 清除移进来的位图
+      let image = sketch.find("Image,[name='位图']");
+      let x = 0;
+      let y = 0;
+      let parent = null;
+      image.forEach((item) => {
+        parent = item.parent;
+        x = item.frame.x;
+        y = item.frame.y;
+        item.parent = nil;
+        item.remove();
+      });
+
+      // if (symbolList.length > 0) {
+      //   symbolReferences = symbolList;
+      // } else {
+      //   let libraries = require("sketch/dom").getLibraries();
+
+      //   let library = libraries.filter(
+      //     (item) => item.name === COMPONENTSYMBOLS
+      //   )[0];
+      //   if (library) {
+      //     symbolReferences = library.getImportableSymbolReferencesForDocument(
+      //       document
+      //     );
+      //   }
+      // }
+
+      let  dragSymbol = componentList.filter((item) => {
+        return item.symbolReference.id === id;
+      })[0].symbolReference;;
+      
+      
+
+      if (dragSymbol) {
+        let page = document.selectedPage;
+
+        let symbolMaster = dragSymbol.import();
+        let symbolInstance = symbolMaster.createNewInstance();
+        if (parent) {
+          if (parent.type === 'Page') {
+            symbolInstance.frame.x = x;
+            symbolInstance.frame.y = y;
+            symbolInstance.parent = page;
+          } else {
+            symbolInstance.frame.x = x;
+            symbolInstance.frame.y = y;
+            symbolInstance.parent = parent;
+            parent.parent = page;
+          }
+          // if(parent.type === 'Artboard'){
+          //   symbolInstance.frame.x = x;
+          //   symbolInstance.frame.y =  y;
+          //   symbolInstance.parent = parent;
+          //   parent.parent = page;
+          //   //document.sketchObject.inspectorController().reload()
+          //   // artboard.adjustToFit();
+          // }else if(parent.type === 'Page'){
+          //   symbolInstance.frame.x = x;
+          //   symbolInstance.frame.y = y;
+          //   symbolInstance.parent = page;
+          // }
+          // else {
+          //   console.log("拖拽到了一个非画板和页面的元素,开发者没有想到呢啊.联系程序员改bug");
+          // }
+        } else {
+          UI.message("拖拽没有移入进来。因为它没有父元素啊");
+        }
+      } else {
+        UI.message(id + "图标找不到了");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  webContents.on("getFrameworksByIds", function (symbolId) {
+    getImagesByIds(symbolId, navName).then(res => {
+      webContents
+        .executeJavaScript(`getSymbolImage(${JSON.stringify(res)})`)
+        .catch(console.error);
+    });
+
+  })
 }

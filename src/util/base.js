@@ -3,7 +3,8 @@ import {
 } from "path";
 import {
   COMPONENTSYMBOLS,
-  DESIGNICONSYMBOLS
+  DESIGNICONSYMBOLS,
+  FRAMEWORKSYMBOLS
 } from "./constants";
 import {
   threadDictionary
@@ -100,7 +101,6 @@ function getSelectefArtboardIds() {
 function getBase64_sektchData(ids) {
   let arr = [];
   ids = JSON.parse(ids);
-  console.log(ids);
   ids.map(artboardId => {
     let artboard = sketch.find('Artboard,[id="' + artboardId + '"]');
     let artboardBase64 = miniImage(artboard[0]);
@@ -194,6 +194,10 @@ async function getSymbols(libraryName, callback) {
     }
   }
 
+  if(libraryName === FRAMEWORKSYMBOLS){
+    symbolList = getSymboldData_image(symbolReferences);
+  }
+
   if (callback) {
     callback(symbolList);
   }
@@ -210,12 +214,14 @@ export async function getSymbols_noImage(libraryName, callback) {
       symbolList = symbolReferences;
     }
   }
-  if (libraryName === DESIGNICONSYMBOLS) {
+  else if (libraryName === DESIGNICONSYMBOLS) {
     if (designIcons.length > 0) {
       symbolList = designIcons;
     } else {
       symbolList = symbolReferences;
     }
+  }else{
+    symbolList = symbolReferences;
   }
 
   if (callback) {
@@ -293,7 +299,9 @@ async function getLibraryIcons(libraryName) {
   let url = '';
   if (libraryName === DESIGNICONSYMBOLS) {
     url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/globalstyle/globalstyle-icon.xml';
-  } else {
+  } else if(libraryName === FRAMEWORKSYMBOLS){
+    url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/component/framework.xml';
+  }else {
     url = 'https://sketchrsslibrary.github.io/sketchrsslibrary/component/component.xml';
   }
 
