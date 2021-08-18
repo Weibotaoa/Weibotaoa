@@ -1,7 +1,7 @@
 {
   "name": "Dmart",
   "description": "sketch插件",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "engines": {
     "sketch": ">=49.0"
   },
