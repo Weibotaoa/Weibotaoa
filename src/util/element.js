@@ -255,7 +255,7 @@ export const createBrowerWindow = (params) => {
   browserWindow.center();
   // threadDictionary[options.identifier] = browserWindow;
   let window = NSApp.mainWindow();
-  browserWindow.setAlwaysOnTop(false);
+  browserWindow.setAlwaysOnTop(true);
   browserWindow.acceptFirstMouse = true;
   browserWindow.isMovable(false);
   let sidebar = threadDictionary[PLUGIN_HS_SIDEBAR];
