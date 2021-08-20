@@ -86,7 +86,7 @@ function switchToolBar(context, loginInfo) {
       PLUGINS_HS_PANEL_WEB,
       "webPlat",
       376,
-      652
+      672
     );
     // toogleColor(self, "webPlat");
     // let gestureRecoginizer = NSClickGestureRecognizer.alloc()
